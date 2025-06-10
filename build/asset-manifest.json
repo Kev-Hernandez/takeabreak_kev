@@ -1,0 +1,14 @@
+{
+  "files": {
+    "main.css": "/static/css/main.3c98c6be.css",
+    "main.js": "/static/js/main.f01c8608.js",
+    "static/media/muñequito.png": "/static/media/muñequito.deef1eae7e32210f54ca.png",
+    "index.html": "/index.html",
+    "main.3c98c6be.css.map": "/static/css/main.3c98c6be.css.map",
+    "main.f01c8608.js.map": "/static/js/main.f01c8608.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.3c98c6be.css",
+    "static/js/main.f01c8608.js"
+  ]
+}

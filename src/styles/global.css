@@ -1,0 +1,238 @@
+/* ESTILOS GENERALES */
+body, html {
+    display: flex;
+    min-height: 100vh;
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+    background-color: #69015A; /*Usa la misma fuente que MUI por defecto */
+}
+#root {
+    width: 100%;
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+}
+/* CONTENEDOR PRINCIPAL */
+.home-container {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+  background-color: #69015A;
+}
+
+/* FIGURAS DECORATIVAS */
+.decorative-shape {
+  position: absolute;
+  opacity: 0.8;
+}
+
+.shape-1 {
+  top: 40px;
+  left: 40px;
+  width: 208px;
+  height: 160px;
+  background-color: #7dfbfc;
+  border-radius: 60%;
+  transform: rotate(25deg);
+}
+
+.shape-2 {
+  bottom: 64px;
+  left: 160px;
+  width: 240px;
+  height: 192px;
+  background-color: #fd6547;
+  border-radius: 50%;
+  transform: rotate(-20deg);
+}
+
+.shape-3 {
+  top: 80px;
+  right: 64px;
+  width: 160px;
+  height: 128px;
+  background-color: #e9e3a0;
+  border-radius: 55%;
+  transform: rotate(40deg);
+}
+
+.shape-4 {
+  bottom: 96px;
+  right: 40px;
+  width: 128px;
+  height: 128px;
+  background-color: #f7bbd3;
+  border-radius: 50%;
+}
+
+/* CÍRCULO CON EFECTO DE PULSO */
+.pulse-circle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 160px;
+  height: 160px;
+  background-color: #45013B;
+  border-radius: 50%;
+  opacity: 1;
+  transform: translate(-50%, -50%);
+  animation: ping 3s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+/* CONTENIDO IZQUIERDO */
+.left-content {
+  width: 50%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 0 32px;
+  z-index: 1;
+  position: relative;
+}
+
+.main-title {
+    margin: 0;
+    font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+    font-weight: 300;
+    font-size: 3.75rem;
+    line-height: 1.2;
+    letter-spacing: -0.00833em;
+    color: #69a5e6;
+    font-weight: 700;
+    margin-bottom: 16px;
+    text-align: center;
+}
+
+.subtitle {
+    margin: 0;
+    font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+    font-weight: 400;
+    font-size: 2.125rem;
+    line-height: 1.235;
+    letter-spacing: 0.00735em;
+    color: #9fb49f;
+    display: -webkit-flex;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    gap: 8px;
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+.dots {
+  color: #FFFFFF;
+  font-size: 2rem;
+}
+
+.character-image {
+  width: 250px;
+  height: auto;
+  margin-top: 20px;
+  position: absolute;
+  bottom: 50px;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
+}
+
+/* CONTENIDO DERECHO */
+.right-content {
+  width: 50%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 0 16px;
+  text-align: center;
+}
+
+.right-title {
+    margin: 0;
+    font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+    font-size: 2.125rem;
+    line-height: 1.235;
+    letter-spacing: 0.00735em;
+    color: #93b6fb;
+    font-weight: 600;
+    margin-bottom: 24px;
+
+}
+
+.buttons-container {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+/* BOTONES */
+.login-button, 
+.register-button {
+    background-color: #658dd370;    
+    cursor: pointer;
+    padding: 12px 24px;
+    border-radius: 12px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    margin-top: 1rem;
+    box-shadow: 0px 3px 1px -2px rgba(0, 0, 0, 0.2), 
+                0px 2px 2px 0px rgba(0, 0, 0, 0.14), 
+                0px 1px 5px 0px rgba(0, 0, 0, 0.12);
+    font-size: 0.875rem;
+    line-height: 1.75;
+    font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+    position: relative;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+    border: none;
+    color: white;
+    transform: translateY(0); /* Posición inicial */
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); /* Animación suave */
+}
+
+.login-button:hover, 
+.register-button:hover {
+    background-color: #4256b3;
+    transform: translateY(-4px); /* Movimiento hacia arriba */
+    box-shadow: 0px 5px 5px -3px rgba(0, 0, 0, 0.2), 
+                0px 8px 10px 1px rgba(0, 0, 0, 0.14), 
+                0px 3px 14px 2px rgba(0, 0, 0, 0.12); /* Sombra más pronunciada */
+    text-transform: none;
+}
+
+/* PIE DE PÁGINA */
+.footer {
+  position: absolute;
+  bottom: 16px;
+  display: flex;
+  gap: 8px;
+  color: #E6D5E4;
+  font-size: 0.875rem;
+}
+
+.footer-link {
+    margin: 0;
+    font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+    font-weight: 400;
+    font-size: 1rem;
+    line-height: 1.5;
+    letter-spacing: 0.00938em;
+    color: inherit;
+    -webkit-text-decoration: none;
+    text-decoration: none;
+}
+
+.footer-link:hover {
+  text-decoration: underline;
+  color: #FFFFFF;
+}
+
+/* ANIMACIÓN PING */
+@keyframes ping {
+  0% { transform: translate(-50%, -50%) scale(1); opacity: 0.4; }
+  75% { transform: translate(-50%, -50%) scale(2); opacity: 0; }
+  100% { transform: translate(-50%, -50%) scale(2); opacity: 0; }
+}
