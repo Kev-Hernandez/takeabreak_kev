@@ -171,7 +171,7 @@ body, html {
 /* BOTONES */
 .login-button, 
 .register-button {
-    background-color: #658dd370;    
+    background-color: #5feafcc4;    
     cursor: pointer;
     padding: 12px 24px;
     border-radius: 12px;
@@ -236,3 +236,312 @@ body, html {
   75% { transform: translate(-50%, -50%) scale(2); opacity: 0; }
   100% { transform: translate(-50%, -50%) scale(2); opacity: 0; }
 }
+
+/*para login*/
+
+/* Fondo general transparente para el Box principal */
+.login-box {
+  background-color: transparent;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 16px;
+}
+
+/* Contenedor centrado */
+.login-container {
+  width: 100%;
+  max-width: 400px;
+  border-radius: 16px;
+  padding: 20px;
+}
+
+/* Estilo para el Paper */
+.MuiPaper-root.login-paper {
+  background-color: rgba(14, 12, 13, 0.438) !important;
+  border-radius: 12px !important;
+  padding: 24px 32px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Título principal */
+.MuiTypography-root.login-title {
+  color: #93b6fb !important;
+  font-weight: 700 !important;
+  font-size: 3rem !important;
+  margin-bottom: 8px !important;
+  user-select: none !important;
+}
+
+/* Subtítulo */
+.MuiTypography-root.login-subtitle {
+  color: #1976d2 !important;
+  font-weight: 500 !important;
+  font-size: 1.25rem !important;
+  margin-bottom: 24px !important;
+  user-select: none !important;
+}
+
+.MuiTypography-root.login-registeryet {
+  color: #4b6681 !important;
+  font-weight: 500 !important;
+  margin-bottom: 24px !important;
+  user-select: none !important;
+}
+
+/* Formulario */
+.login-form {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Inputs */
+.login-form .MuiTextField-root {
+  border-radius: 12px !important;
+  border: 1px solid #ddd !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+  margin-top: 12px !important;
+  margin-bottom: 12px !important;
+}
+
+/* Validaciones */
+.login-form ul {
+  list-style-type: disc;
+  padding-left: 20px;
+  margin-top: -8px;
+  margin-bottom: 16px;
+  color: #555;
+  font-size: 0.875rem;
+}
+
+/* Botón submit */
+.login-form button[type="submit"],
+.login-form .MuiButton-root[type="submit"] {
+  background-color: #93b6fb !important;
+  color: white !important;
+  margin-top: 24px !important;
+  padding: 12px 0 !important;
+  font-weight: 600 !important;
+  border-radius: 12px !important;
+  border: none !important;
+  cursor: pointer;
+  transition: background-color 0.3s ease !important;
+}
+
+.login-form button[type="submit"]:hover,
+.login-form .MuiButton-root[type="submit"]:hover {
+  background-color: #155a9a !important;
+}
+
+/* Footer */
+.login-footer {
+  margin-top: 24px;
+  font-size: 0.875rem;
+  color: #444;
+  text-align: center;
+  user-select: none;
+}
+
+/* Link de registro */
+.login-footer a {
+  color: #1976d2;
+  margin-left: 6px;
+  text-decoration: none;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.login-footer a:hover {
+  color: #155a9a;
+  text-decoration: underline;
+}
+
+
+
+/* Color del texto del input */
+.login-input input {
+  color: #1976d2;
+}
+
+/* Label normal */
+.login-input label {
+  color: #e9edf1;
+}
+
+/* Label enfocado */
+.login-input label.Mui-focused {
+  color: #0d47a1;
+}
+
+/* Borde del input */
+.login-input .MuiOutlinedInput-root fieldset {
+  border-color: #1976d2;
+}
+
+/* Borde hover */
+.login-input .MuiOutlinedInput-root:hover fieldset {
+  border-color: #115293;
+}
+
+/* Borde enfocado */
+.login-input .MuiOutlinedInput-root.Mui-focused fieldset {
+  border-color: #0d47a1;
+}
+
+/* Texto del helperText (error abajo del input) */
+.login-input .MuiFormHelperText-root {
+  color: red;
+}
+
+
+/*register estilos*/
+
+/* Fondo general transparente para el Box principal */
+.register-box {
+  background-color: transparent;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 16px;
+}
+
+/* Contenedor centrado */
+.register-container {
+  width: 100%;
+  max-width: 400px;
+  border-radius: 16px;
+  padding: 20px;
+}
+
+/* Estilo para el Paper */
+.MuiPaper-root.register-paper {
+  background-color: rgba(14, 12, 13, 0.438) !important;
+  border-radius: 12px !important;
+  padding: 24px 32px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Título principal */
+.MuiTypography-root.register-title {
+  color: #93b6fb !important;
+  font-weight: 700 !important;
+  font-size: 3rem !important;
+  margin-bottom: 8px !important;
+  user-select: none !important;
+}
+
+/* Subtítulo */
+.MuiTypography-root.register-subtitle {
+  color: #1976d2 !important;
+  font-weight: 500 !important;
+  font-size: 1.25rem !important;
+  margin-bottom: 24px !important;
+  user-select: none !important;
+}
+
+/* Formulario */
+.register-form {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Inputs */
+.register-form .MuiTextField-root {
+  border-radius: 12px !important;
+  border: 1px solid #ddd !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+  margin-top: 12px !important;
+  margin-bottom: 12px !important;
+}
+
+/* Validaciones */
+.register-form ul {
+  list-style-type: disc;
+  padding-left: 20px;
+  margin-top: -8px;
+  margin-bottom: 16px;
+  color: #555;
+  font-size: 0.875rem;
+}
+
+/* Botón submit */
+.register-form button[type="submit"],
+.register-form .MuiButton-root[type="submit"] {
+  background-color: #93b6fb !important;
+  color: white !important;
+  margin-top: 24px !important;
+  padding: 12px 0 !important;
+  font-weight: 600 !important;
+  border-radius: 12px !important;
+  border: none !important;
+  cursor: pointer;
+  transition: background-color 0.3s ease !important;
+}
+
+.register-form button[type="submit"]:hover,
+.register-form .MuiButton-root[type="submit"]:hover {
+  background-color: #155a9a !important;
+}
+
+/* Footer de login link */
+.register-login-text {
+  margin-top: 24px;
+  font-size: 0.875rem;
+  color: #444;
+  text-align: center;
+  user-select: none;
+}
+
+/* Link de login */
+.register-login-link {
+  color: #1976d2;
+  margin-left: 6px;
+  text-decoration: none;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.register-login-link:hover {
+  color: #155a9a;
+  text-decoration: underline;
+}
+
+/* Color del texto del input */
+.register-input input {
+  color: #1976d2;
+}
+
+/* Label normal */
+.register-input label {
+  color: #e9edf1;
+}
+
+/* Label enfocado */
+.register-input label.Mui-focused {
+  color: #0d47a1;
+}
+
+/* Borde del input */
+.register-input .MuiOutlinedInput-root fieldset {
+  border-color: #1976d2;
+}
+
+/* Borde hover */
+.register-input .MuiOutlinedInput-root:hover fieldset {
+  border-color: #115293;
+}
+
+/* Borde enfocado */
+.register-input .MuiOutlinedInput-root.Mui-focused fieldset {
+  border-color: #0d47a1;
+}
+
+/* Texto del helperText (error abajo del input) */
+.register-input .MuiFormHelperText-root {
+  color: red;
+}
+

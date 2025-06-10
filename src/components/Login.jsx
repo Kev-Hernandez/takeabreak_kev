@@ -108,13 +108,14 @@ const Login = () => {
   };
 
   return (
-    <Box>
-      <Container maxWidth="xs">
-        <Paper elevation={0}>
-          <Typography align="center">Take a Break</Typography>
-          <Typography align="center">Iniciar Sesión</Typography>
-          <Box component="form" onSubmit={handleSubmit} noValidate>
-            <TextField 
+    <Box className="login-box">
+      <Container maxWidth="xs" className="login-container">
+        <Paper elevation={0} className="login-paper">
+          <Typography align="center" className="login-title">Take a Break</Typography>
+          <Typography align="center" className="login-subtitle">Iniciar Sesión</Typography>
+          <Box component="form" onSubmit={handleSubmit} noValidate className="login-form">
+            <TextField
+              className="login-input" 
               margin="normal" 
               required 
               fullWidth 
@@ -142,7 +143,8 @@ const Login = () => {
                 ))}
               </List>
             )}
-            <TextField 
+            <TextField
+              className="login-input" 
               margin="normal" 
               required 
               fullWidth 
@@ -177,7 +179,7 @@ const Login = () => {
               Iniciar Sesión
             </Button>
           </Box>
-          <Typography variant="body2">
+          <Typography className='login-registeryet' variant="body2">
             ¿Aun no te has registrado?
             <Button
               component="a"

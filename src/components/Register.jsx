@@ -95,64 +95,64 @@ const Register = () => {
   };
 
   return (
-    <Box>
-      <Container maxWidth="xs">
-        <Paper elevation={0}>
-          <Typography component="h1" variant="h3" align="center" gutterBottom>
+    <Box className="register-box">
+      <Container maxWidth="xs" className="register-container">
+        <Paper elevation={0} className="register-paper">
+          <Typography component="h1" variant="h3" align="center" className="register-title">
             Take a Break
           </Typography>
-          <Typography component="h2" variant="h5" align="center" gutterBottom>
+          <Typography component="h2" variant="h5" align="center" className="register-subtitle">
             Registro
           </Typography>
-          <Box component="form" onSubmit={handleSubmit} noValidate>
+          <Box component="form" onSubmit={handleSubmit} noValidate className="register-form">
             <TextField
+              className="register-input"
               margin="normal"
               required
               fullWidth
               id="nombre"
               label="Nombre"
               name="nombre"
-              autoComplete="given-name"
               value={formData.nombre}
               onChange={handleChange}
               error={!!errors.nombre}
               helperText={errors.nombre}
             />
             <TextField
+              className="register-input"
               margin="normal"
               required
               fullWidth
               id="apellido"
               label="Apellidos"
               name="apellido"
-              autoComplete="family-name"
               value={formData.apellido}
               onChange={handleChange}
               error={!!errors.apellido}
               helperText={errors.apellido}
             />
             <TextField
+              className="register-input"
               margin="normal"
               required
               fullWidth
               id="correo"
               label="Correo Electrónico"
               name="correo"
-              autoComplete="email"
               value={formData.correo}
               onChange={handleChange}
               error={!!errors.correo}
               helperText={errors.correo}
             />
             <TextField
+              className="register-input"
               margin="normal"
               required
               fullWidth
-              name="contraseña"
-              label="Contraseña"
-              type="password"
               id="contraseña"
-              autoComplete="new-password"
+              label="Contraseña"
+              name="contraseña"
+              type="password"
               value={formData.contraseña}
               onChange={handleChange}
               error={!!errors.contraseña}
@@ -162,15 +162,13 @@ const Register = () => {
               <DatePicker
                 label="Fecha de Nacimiento"
                 value={formData.fechaNacimiento}
-                onChange={(newValue) => {
-                  setFormData(prev => ({
-                    ...prev,
-                    fechaNacimiento: newValue
-                  }));
-                }}
+                onChange={(newValue) =>
+                  setFormData((prev) => ({ ...prev, fechaNacimiento: newValue }))
+                }
                 slotProps={{
                   textField: {
-                    margin: "normal",
+                    className: 'register-input',
+                    margin: 'normal',
                     required: true,
                     fullWidth: true,
                     error: !!errors.fechaNacimiento,
@@ -179,22 +177,21 @@ const Register = () => {
                 }}
               />
             </LocalizationProvider>
+
             {errors.submit && (
               <Typography color="error" align="center">
                 {errors.submit}
               </Typography>
             )}
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-            >
+
+            <Button type="submit" fullWidth variant="contained" className="register-button">
               Registrarse
             </Button>
             <Button
               fullWidth
               variant="text"
               onClick={() => navigate('/login')}
+              className="register-link"
             >
               ¿Ya tienes una cuenta? Inicia sesión
             </Button>
