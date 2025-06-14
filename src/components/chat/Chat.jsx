@@ -11,7 +11,8 @@ const Chat = () => {
   const [socket, setSocket] = useState(null);
 
   useEffect(() => {
-    const ws = new WebSocket('ws://localhost:5000');
+    const socket = new WebSocket('ws://localhost:5000');
+
 
     ws.onopen = () => {
       console.log('Conectado al servidor WebSocket');
