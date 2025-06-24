@@ -58,12 +58,20 @@ const Login = () => {
 
   return (
     <Box className="login-box">
+      {/* Formas decorativas */}
+      <div className="decorative-shape shape-1"></div>
+      <div className="decorative-shape shape-2"></div>
+      <div className="decorative-shape shape-3"></div>
+      <div className="decorative-shape shape-4"></div>
+
+      {/* Círculo con efecto de pulso */}
+      <div className="pulse-circle"></div>
       <Container maxWidth="xs" className="login-container">
         <Paper elevation={0} className="login-paper" sx={{ padding: 3 }}>
-          <Typography align="center" variant="h3" gutterBottom>
+          <Typography align="center" variant="h3" gutterBottom className="login-title">
             Take a Break
           </Typography>
-          <Typography align="center" variant="h5" gutterBottom>
+          <Typography align="center" variant="h5" gutterBottom className="login-subtitle">
             Iniciar Sesión
           </Typography>
 

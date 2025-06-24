@@ -1,12 +1,14 @@
 /* ESTILOS GENERALES */
-body, html {
-    display: flex;
-    min-height: 100vh;
-    width: 100%;
-    position: relative;
-    overflow: hidden;
-    background-color: #69015A; /*Usa la misma fuente que MUI por defecto */
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  overflow-y: auto;
+  background-color: #69015A;
+  font-family: 'Roboto', sans-serif; /* Fuente por defecto de MUI */
 }
+
 #root {
     width: 100%;
     min-height: 100vh;
@@ -196,7 +198,7 @@ body, html {
 .login-button:hover, 
 .register-button:hover {
     background-color: #4256b3;
-    transform: translateY(-4px); /* Movimiento hacia arriba */
+    transform: translateY(-1px); /* Movimiento hacia arriba */
     box-shadow: 0px 5px 5px -3px rgba(0, 0, 0, 0.2), 
                 0px 8px 10px 1px rgba(0, 0, 0, 0.14), 
                 0px 3px 14px 2px rgba(0, 0, 0, 0.12); /* Sombra más pronunciada */
@@ -246,7 +248,7 @@ body, html {
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 16px;
+  padding: 32px 16px;
 }
 
 /* Contenedor centrado */
@@ -400,12 +402,11 @@ body, html {
 
 /* Fondo general transparente para el Box principal */
 .register-box {
-  background-color: transparent;
   min-height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 16px;
+
 }
 
 /* Contenedor centrado */
@@ -449,13 +450,16 @@ body, html {
 }
 
 /* Inputs */
-.register-form .MuiTextField-root {
-  border-radius: 12px !important;
-  border: 1px solid #ddd !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
-  margin-top: 12px !important;
-  margin-bottom: 12px !important;
+.register-form .MuiOutlinedInput-root {
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  /* Evita modificar el border directamente */
 }
+
+.register-form .MuiOutlinedInput-notchedOutline {
+  border: 1px solid #ddd;
+}
+
 
 /* Validaciones */
 .register-form ul {
@@ -483,7 +487,7 @@ body, html {
 
 .register-form button[type="submit"]:hover,
 .register-form .MuiButton-root[type="submit"]:hover {
-  background-color: #155a9a !important;
+  background-color: #1083f0 !important;
 }
 
 /* Footer de login link */
@@ -496,8 +500,8 @@ body, html {
 }
 
 /* Link de login */
-.register-login-link {
-  color: #1976d2;
+.register-register-link {
+  color: #5fbb09;
   margin-left: 6px;
   text-decoration: none;
   font-weight: 600;
@@ -512,7 +516,7 @@ body, html {
 
 /* Color del texto del input */
 .register-input input {
-  color: #1976d2;
+  color: #ffffff;
 }
 
 /* Label normal */
@@ -522,7 +526,7 @@ body, html {
 
 /* Label enfocado */
 .register-input label.Mui-focused {
-  color: #0d47a1;
+  color: #ffffff;
 }
 
 /* Borde del input */
@@ -545,3 +549,78 @@ body, html {
   color: red;
 }
 
+/*register estilos*/
+
+.register-box {
+  min-height: 100vh; /* Asegura altura completa de la pantalla */
+  display: flex;
+  justify-content: center;
+  align-items: flex-start; /* O 'center' si quieres centrado vertical */
+  padding-top: 40px; /* Espacio superior para que no quede pegado */
+  overflow-y: auto; /* Permite scroll si se necesita */
+  position: relative;
+}
+
+.register-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-bottom: 40px; /* Espacio extra si hay contenido largo */
+}
+
+.register-paper {
+  padding: 32px;
+  width: 100%;
+  max-width: 420px;
+  border-radius: 16px;
+  background-color: white;
+}
+
+.MuiTypography-root.login-title {
+  color: #93b6fb !important;
+  font-weight: 700 !important;
+  font-size: 3rem !important;
+  margin-bottom: 8px !important;
+  user-select: none !important;
+}
+
+.MuiTypography-root.login-subtitle {
+  color: #1976d2 !important;
+  font-weight: 500 !important;
+  font-size: 1.25rem !important;
+  margin-bottom: 24px !important;
+  user-select: none !important;
+}
+
+/* Estilo para el valor seleccionado en TextField select */
+.register-input .MuiSelect-select {
+  color: white !important;
+}
+
+/* También el icono desplegable */
+.register-input .MuiSelect-icon {
+  color: white !important;
+}
+.register-input .MuiOutlinedInput-root {
+  background-color: rgba(255, 255, 255, 0.05); /* o lo que combine con tu fondo */
+}
+
+.register-link {
+  margin-top: 8px !important;
+  color: #1976d2 !important;
+  font-weight:bolder !important;
+  text-transform: none !important;
+  background-color: transparent !important;
+}
+
+.register-link:hover {
+  color: #ffffff !important;
+  text-decoration: underline !important;
+}
+.character-registerimage {
+  width: 250px;
+  height: auto;
+  margin: 20px auto 0 auto; /* margen arriba y centrado horizontal */
+  display: block; /* para que respete el margin auto */
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
+}

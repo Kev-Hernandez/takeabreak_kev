@@ -15,22 +15,26 @@ const Chat = () => {
   const [newMessage, setNewMessage] = useState('');
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [socket, setSocket] = useState(null);
-
+  
   useEffect(() => {
+    // Crear la conexión WebSocket al servidor
     const socket = new WebSocket('ws://localhost:5000');
 
-
-    ws.onopen = () => {
+    // Cuando se abra la conexión
+    socket.onopen = () => {
       console.log('✅ Conectado al WebSocket');
     };
 
-    ws.onmessage = (event) => {
+    // Cuando se reciba un mensaje
+    socket.onmessage = (event) => {
       try {
-        const data = JSON.parse(event.data);
+        const data = JSON.parse(event.data); // Parsear el mensaje JSON
         console.log('📩 Mensaje recibido del servidor:', JSON.stringify(data, null, 2));
 
+        // Verificar si el mensaje es del usuario actual
         const isMine = data.remitenteId === userId;
 
+        // Actualizar la lista de mensajes en el estado
         setMessages((prev) => [
           ...prev,
           {
@@ -43,12 +47,19 @@ const Chat = () => {
       }
     };
 
-    ws.onerror = (err) => console.error('WebSocket error:', err);
-    ws.onclose = () => console.log('❌ WebSocket cerrado');
+    // Manejar error de conexión
+    socket.onerror = (err) => console.error('WebSocket error:', err);
 
-    setSocket(ws);
-    return () => ws.close();
+    // Cuando se cierre la conexión
+    socket.onclose = () => console.log('❌ WebSocket cerrado');
+
+    // Guardar la conexión en el estado para poder usarla después
+    setSocket(socket);
+
+    // Cleanup: cerrar conexión cuando el componente se desmonte o userId cambie
+    return () => socket.close();
   }, [userId]);
+
 
   const handleKeyPress = (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
