@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import muñequito from '../assets/muñequito.png';
+import muñequito from '../assets/muñequito.png'
 import '../styles/global.css'
 
 export default function Home() {

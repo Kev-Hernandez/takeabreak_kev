@@ -10,7 +10,7 @@ const Login = () => {
   // Estado para datos del formulario (sin validaciones ni errores)
   const [formData, setFormData] = useState({
     correo: '',
-    contraseña: ''
+    password: ''
   });
 
   const [errors, setErrors] = useState({});
@@ -28,16 +28,15 @@ const Login = () => {
         },
         body: JSON.stringify({
           email: formData.correo,         // Cambié "correo" por "email" aquí
-          contraseña: formData.contraseña
+          password: formData.password
         }),
       });
 
+      const data = await response.json();
       if (response.ok) {
-        // Login correcto, ir a chat
+        localStorage.setItem('token', data.token)
         navigate('/chat');
       } else {
-        // Mostrar error si algo falla en backend
-        const data = await response.json();
         setErrors({ submit: data.mensaje || 'Error en el inicio de sesión' });
       }
     } catch (error) {
@@ -99,11 +98,11 @@ const Login = () => {
               margin="normal"
               required
               fullWidth
-              name="contraseña"
-              label="Contraseña"
+              name="password"
+              label="password"
               type="password"
-              id="contraseña"
-              value={formData.contraseña}
+              id="password"
+              value={formData.password}
               onChange={handleChange}
             />
 

@@ -3,7 +3,7 @@ import {
   Box, TextField, Button, Typography, Container, Paper, MenuItem
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import muñequito from '../assets/muñequito.png';
+import muñequito from '../../assets/muñequito.png';
 
 const Register = () => {
   const navigate = useNavigate();
@@ -12,7 +12,7 @@ const Register = () => {
     nombre: '',
     apellido: '',
     email: '',
-    contraseña: '',
+    password: '',
     edad: '',
     sexo: ''
   });
@@ -33,10 +33,10 @@ const Register = () => {
       newErrors.email = 'Correo inválido';
     }
 
-    if (!formData.contraseña) newErrors.contraseña = 'La contraseña es requerida';
-    else if (formData.contraseña.length < 8) newErrors.contraseña = 'Debe tener al menos 8 caracteres';
-    else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])/.test(formData.contraseña)) {
-      newErrors.contraseña = 'Debe tener mayúscula, minúscula, número y símbolo';
+    if (!formData.password) newErrors.password = 'La password es requerida';
+    else if (formData.password.length < 8) newErrors.password = 'Debe tener al menos 8 caracteres';
+    else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])/.test(formData.password)) {
+      newErrors.password = 'Debe tener mayúscula, minúscula, número y símbolo';
     }
 
     if (!formData.edad) newErrors.edad = 'La edad es requerida';
@@ -57,7 +57,7 @@ const Register = () => {
           nombre: formData.nombre,
           apellido: formData.apellido,
           email: formData.email,
-          contraseña: formData.contraseña,
+          password: formData.password,
           edad: Number(formData.edad),
           sexo: formData.sexo,
           preferences: {
@@ -156,13 +156,13 @@ const Register = () => {
               margin="normal"
               required
               fullWidth
-              label="Contraseña"
-              name="contraseña"
+              label="password"
+              name="password"
               type="password"
-              value={formData.contraseña}
+              value={formData.password}
               onChange={handleChange}
-              error={!!errors.contraseña}
-              helperText={errors.contraseña}
+              error={!!errors.password}
+              helperText={errors.password}
               className="register-input"
             />
             <TextField
