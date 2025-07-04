@@ -3,7 +3,8 @@ import {
   Box, TextField, Button, Typography, Container, Paper, MenuItem
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import muñequito from '../assets/muñequito.png';
+import monitolibro from '../assets/monitolibro.png';
+import '../styles/register.css'
 
 const Register = () => {
   const navigate = useNavigate();
@@ -103,7 +104,7 @@ const Register = () => {
       <div className="decorative-shape shape-4"></div>
       <Container maxWidth="xs" className="register-container">
         <img 
-          src={muñequito} 
+          src={monitolibro} 
           alt="Muñeco-head" 
           className="character-registerimage"
         />
@@ -202,7 +203,7 @@ const Register = () => {
               </Typography>
             )}
 
-            <Button type="submit" fullWidth variant="contained" className="register-button">
+            <Button type="submit" fullWidth variant="contained" className="register-submit">
               REGISTRARSE
             </Button>
             <Button

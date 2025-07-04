@@ -1,0 +1,170 @@
+/* Contenedor general */
+.MuiBox-root.login-box {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 40px 16px;
+  overflow-y: auto;
+  position: relative;
+  box-sizing: border-box;
+  background-color: transparent;
+}
+
+/* Contenedor del contenido */
+.MuiContainer-root.login-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 90vw;
+  padding-bottom: 40px;
+  box-sizing: border-box;
+}
+
+/* Imagen decorativa */
+.character-loginimage {
+  width: 100%;
+  max-width: 260px;
+  height: auto;
+  margin: 20px auto 0 auto;
+  display: block;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
+  transition: all 0.3s ease-in-out;
+}
+
+/* Paper del formulario */
+.MuiPaper-root.login-paper {
+  width: 100%;
+  max-width: 600px;
+  background-color: rgba(14, 12, 13, 0.774) !important;
+  border-radius: 16px !important;
+  padding: 32px !important;
+  box-sizing: border-box;
+}
+
+/* Títulos */
+.MuiTypography-root.login-title {
+  color: #93b6fb !important;
+  font-weight: 700 !important;
+  font-size: clamp(2rem, 5vw, 3rem) !important;
+  text-align: center !important;
+  margin-bottom: 8px !important;
+}
+
+.MuiTypography-root.login-subtitle {
+  color: #1976d2 !important;
+  font-weight: 500 !important;
+  font-size: clamp(1rem, 2vw, 1.5rem) !important;
+  text-align: center !important;
+  margin-bottom: 24px !important;
+}
+
+/* Formulario */
+.MuiBox-root.login-form {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+/* TextField general */
+.login-form .MuiOutlinedInput-root {
+  border-radius: 12px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Input interno */
+.login-input input {
+  color: #ffffff !important;
+}
+
+/* Label del campo */
+.login-input label {
+  color: #e9edf1 !important;
+}
+
+.login-input label.Mui-focused {
+  color: #ffffff !important;
+}
+
+/* Bordes del input */
+.login-input .MuiOutlinedInput-root fieldset {
+  border-color: #1976d2 !important;
+}
+
+.login-input .MuiOutlinedInput-root:hover fieldset {
+  border-color: #115293 !important;
+}
+
+.login-input .MuiOutlinedInput-root.Mui-focused fieldset {
+  border-color: #0d47a1 !important;
+}
+
+/* Texto de ayuda o error */
+.login-input .MuiFormHelperText-root {
+  color: red !important;
+}
+
+/* Botón de enviar */
+.MuiButton-root.login-submit {
+  background-color: #1763fa !important;
+  color: white !important;
+  border-radius: 12px !important;
+  margin-top: 24px !important;
+  padding: 12px 0 !important;
+  font-weight: 600 !important;
+  transition: background-color 0.3s ease !important;
+}
+
+.MuiButton-root.login-submit:hover {
+  background-color: #71b1ec !important;
+}
+
+/* Link de registro */
+.MuiButton-root.login-link {
+  margin-top: 8px !important;
+  color: #eff0f1 !important;
+  font-weight: bolder !important;
+  background-color: transparent !important;
+  text-align: center !important;
+  text-transform: none !important;
+}
+
+.MuiButton-root.login-link:hover {
+  color: #ffffff !important;
+  text-decoration: underline !important;
+}
+
+/* Responsive - Tablets */
+@media (max-width: 960px) {
+  .MuiBox-root.login-box {
+    align-items: center;
+    padding-top: 20px;
+  }
+
+  .MuiContainer-root.login-container {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .MuiPaper-root.login-paper {
+    padding: 24px !important;
+    max-width: 100% !important;
+  }
+}
+
+/* Responsive - Escritorio grande */
+@media (min-width: 1200px) {
+  .MuiContainer-root.login-container {
+    max-width: 600px !important;
+  }
+
+  .MuiPaper-root.login-paper {
+    padding: 48px !important;
+  }
+
+  .character-loginimage {
+    max-width: 300px;
+    margin-top: 30px;
+  }
+}

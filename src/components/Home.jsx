@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import muñequito from '../assets/muñequito.png';
-import '../styles/global.css'
+import '../styles/home.css'
 
 export default function Home() {
   const navigate = useNavigate();

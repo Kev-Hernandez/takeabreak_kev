@@ -1,0 +1,183 @@
+/* Contenedor general */
+.MuiBox-root.register-box {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 40px 16px;
+  overflow-y: auto;
+  position: relative;
+  box-sizing: border-box;
+  background-color: transparent;
+}
+
+/* Contenedor del contenido */
+.MuiContainer-root.register-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 90vw;
+  padding-bottom: 40px;
+  box-sizing: border-box;
+}
+
+/* Imagen decorativa */
+.character-registerimage {
+  width: 100%;
+  max-width: 260px;
+  height: auto;
+  margin: 20px auto 0 auto;
+  display: block;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
+  transition: all 0.3s ease-in-out;
+}
+
+/* Contenedor del formulario */
+.MuiPaper-root.register-paper {
+  width: 100%;
+  max-width: 600px;
+  background-color: rgba(14, 12, 13, 0.774) !important;
+  border-radius: 16px !important;
+  padding: 32px !important;
+  box-sizing: border-box;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Títulos */
+.MuiTypography-root.register-title {
+  color: #93b6fb !important;
+  font-weight: 700 !important;
+  font-size: clamp(2rem, 5vw, 3rem) !important;
+  text-align: center !important;
+  margin-bottom: 8px !important;
+}
+
+.MuiTypography-root.register-subtitle {
+  color: #1976d2 !important;
+  font-weight: 500 !important;
+  font-size: clamp(1rem, 2vw, 1.5rem) !important;
+  text-align: center !important;
+  margin-bottom: 24px !important;
+}
+
+/* Formulario */
+.MuiBox-root.register-form {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+/* Input con sombra */
+.register-form .MuiOutlinedInput-root {
+  border-radius: 12px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Borde del campo */
+.register-form .MuiOutlinedInput-notchedOutline {
+  border: 1px solid #ddd !important;
+}
+
+/* Campos de entrada */
+.MuiTextField-root.register-input {
+  margin: 12px 0 !important;
+}
+
+/* Personalización visual de inputs */
+.register-input input {
+  color: #ffffff !important;
+}
+
+.register-input label {
+  color: #e9edf1 !important;
+}
+
+.register-input label.Mui-focused {
+  color: #ffffff !important;
+}
+
+.register-input .MuiOutlinedInput-root fieldset {
+  border-color: #1976d2 !important;
+}
+
+.register-input .MuiOutlinedInput-root:hover fieldset {
+  border-color: #115293 !important;
+}
+
+.register-input .MuiOutlinedInput-root.Mui-focused fieldset {
+  border-color: #0d47a1 !important;
+}
+
+.register-input .MuiFormHelperText-root {
+  color: red !important;
+}
+
+/* Botón de enviar */
+.MuiButton-root.register-submit {
+  background-color: #1763fa !important;
+  color: white !important;
+  border-radius: 12px !important;
+  margin-top: 24px !important;
+  padding: 12px 0 !important;
+  font-weight: 600 !important;
+  transition: background-color 0.3s ease !important;
+}
+
+.MuiButton-root.register-submit:hover {
+  background-color: #71b1ec !important;
+}
+
+/* Link al login */
+.MuiButton-root.register-link {
+  margin-top: 8px !important;
+  color: #ffffff !important;
+  font-weight: bolder !important;
+  background-color: transparent !important;
+  text-align: center !important;
+  text-transform: none !important;
+}
+
+.MuiButton-root.register-link:hover {
+  color: #ffffff !important;
+  text-decoration: underline !important;
+}
+
+/* Pantallas medianas: tablets */
+@media (max-width: 960px) {
+  .MuiBox-root.register-box {
+    align-items: center;
+    padding-top: 20px;
+  }
+
+  .MuiContainer-root.register-container {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .MuiPaper-root.register-paper {
+    padding: 24px !important;
+    max-width: 100% !important;
+  }
+
+  .character-registerimage {
+    max-width: 220px;
+    margin-top: 16px;
+  }
+}
+
+/* Pantallas grandes: escritorio */
+@media (min-width: 1200px) {
+  .MuiContainer-root.register-container {
+    max-width: 600px !important;
+  }
+
+  .MuiPaper-root.register-paper {
+    padding: 48px !important;
+  }
+
+  .character-registerimage {
+    max-width: 300px;
+    margin-top: 30px;
+  }
+}
