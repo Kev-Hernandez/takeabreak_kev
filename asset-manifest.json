@@ -1,16 +1,16 @@
 {
   "files": {
     "main.css": "/takeabreak_kev/static/css/main.56ad9c4f.css",
-    "main.js": "/takeabreak_kev/static/js/main.98abb71c.js",
+    "main.js": "/takeabreak_kev/static/js/main.b745c2fb.js",
     "static/media/muñequito.png": "/takeabreak_kev/static/media/muñequito.deef1eae7e32210f54ca.png",
     "static/media/monitorange.png": "/takeabreak_kev/static/media/monitorange.b1987234d02bf97c5a39.png",
     "static/media/monitolibro.png": "/takeabreak_kev/static/media/monitolibro.15bebbbd0781f07ba822.png",
     "index.html": "/takeabreak_kev/index.html",
     "main.56ad9c4f.css.map": "/takeabreak_kev/static/css/main.56ad9c4f.css.map",
-    "main.98abb71c.js.map": "/takeabreak_kev/static/js/main.98abb71c.js.map"
+    "main.b745c2fb.js.map": "/takeabreak_kev/static/js/main.b745c2fb.js.map"
   },
   "entrypoints": [
     "static/css/main.56ad9c4f.css",
-    "static/js/main.98abb71c.js"
+    "static/js/main.b745c2fb.js"
   ]
 }
