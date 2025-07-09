@@ -5,6 +5,8 @@ import {
 } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 import HistoryIcon from '@mui/icons-material/History';
+const API_URL = process.env.REACT_APP_API_URL;
+const WS_URL = API_URL.replace(/^http/, 'ws') + '/ws'; // Por ejemplo: ws://api-ta-web.onrender.com/ws
 
 const Chat = () => {
   // Simulación de login temporal
@@ -17,8 +19,8 @@ const Chat = () => {
   const [socket, setSocket] = useState(null);
   
   useEffect(() => {
-    // Crear la conexión WebSocket al servidor
-    const socket = new WebSocket('ws://localhost:5000');
+    const socket = new WebSocket(WS_URL);
+
 
     // Cuando se abra la conexión
     socket.onopen = () => {

@@ -21,7 +21,7 @@ const Login = () => {
 
     // Aquí no hacemos validaciones, solo enviamos directamente
     try {
-      const response = await fetch('http://localhost:3001/api/web/auth/login', {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/web/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
