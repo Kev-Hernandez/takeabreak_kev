@@ -5,36 +5,31 @@ import {
 } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 import HistoryIcon from '@mui/icons-material/History';
+import GroupIcon from '@mui/icons-material/Group'; // ícono para Usuarios activos
+import Historial from './Historial'; // Ajusta ruta si está en otra carpeta
+import UsersOn from './UsersOn'; // Importa UsersOn (ajusta ruta según tu estructura)
 
 const Chat = () => {
-  // Simulación de login temporal
   const [userId, setUserId] = useState('665123456789abcd0123abcd'); // kenia
   const [recipientId, setRecipientId] = useState('6851b5a3a1819311862502df');
-
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [showHistorial, setShowHistorial] = useState(true); // controla si muestra historial o usuarios
+  const [usuariosActivos, setUsuariosActivos] = useState([
+    { nombre: 'Ana' },
+    { nombre: 'Carlos' },
+    { email: 'otro@correo.com' }
+  ]);
   const [socket, setSocket] = useState(null);
-  
+
   useEffect(() => {
-    // Crear la conexión WebSocket al servidor
     const socket = new WebSocket('ws://localhost:5000');
-
-    // Cuando se abra la conexión
-    socket.onopen = () => {
-      console.log('✅ Conectado al WebSocket');
-    };
-
-    // Cuando se reciba un mensaje
+    socket.onopen = () => console.log('✅ Conectado al WebSocket');
     socket.onmessage = (event) => {
       try {
-        const data = JSON.parse(event.data); // Parsear el mensaje JSON
-        console.log('📩 Mensaje recibido del servidor:', JSON.stringify(data, null, 2));
-
-        // Verificar si el mensaje es del usuario actual
+        const data = JSON.parse(event.data);
         const isMine = data.remitenteId === userId;
-
-        // Actualizar la lista de mensajes en el estado
         setMessages((prev) => [
           ...prev,
           {
@@ -46,20 +41,11 @@ const Chat = () => {
         console.error('❌ Error al parsear mensaje:', err);
       }
     };
-
-    // Manejar error de conexión
     socket.onerror = (err) => console.error('WebSocket error:', err);
-
-    // Cuando se cierre la conexión
     socket.onclose = () => console.log('❌ WebSocket cerrado');
-
-    // Guardar la conexión en el estado para poder usarla después
     setSocket(socket);
-
-    // Cleanup: cerrar conexión cuando el componente se desmonte o userId cambie
     return () => socket.close();
   }, [userId]);
-
 
   const handleKeyPress = (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -70,13 +56,7 @@ const Chat = () => {
 
   const handleSendMessage = () => {
     if (!newMessage.trim() || !socket || socket.readyState !== WebSocket.OPEN) return;
-
-    const payload = {
-      userId,
-      recipientId,
-      text: newMessage.trim(),
-    };
-
+    const payload = { userId, recipientId, text: newMessage.trim() };
     socket.send(JSON.stringify(payload));
     setNewMessage('');
   };
@@ -94,45 +74,43 @@ const Chat = () => {
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
       <Paper sx={{ p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Typography variant="h6">Take a Break - Chat</Typography>
-        <Button 
-          onClick={() => setDrawerOpen(true)} 
-          startIcon={<HistoryIcon />} 
-          variant="outlined"
-        >
-          Historial
-        </Button>
+        <Box sx={{ display: 'flex', gap: 1 }}>
+          <Button 
+            onClick={() => {
+              setShowHistorial(true);
+              setDrawerOpen(true);
+            }} 
+            startIcon={<HistoryIcon />} 
+            variant="outlined"
+          >
+            Historial
+          </Button>
+          <Button 
+            onClick={() => {
+              setShowHistorial(false);
+              setDrawerOpen(true);
+            }}
+            startIcon={<GroupIcon />}
+            variant="outlined"
+          >
+            Usuarios activos
+          </Button>
+        </Box>
       </Paper>
 
-      {/* Drawer Historial */}
       <Drawer
         anchor="right"
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
-        sx={{ width: 300 }}
       >
-        <Box sx={{ p: 2, width: 300 }}>
-          <Typography variant="h6" sx={{ mb: 2 }}>Historial de Mensajes</Typography>
-          {Object.entries(groupMessagesByDate()).map(([date, msgs]) => (
-            <Box key={date} sx={{ mb: 3 }}>
-              <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>{date}</Typography>
-              <List dense>
-                {msgs.map((msg, idx) => (
-                  <ListItem key={idx} sx={{ py: 0.5 }}>
-                    <ListItemText 
-                      primary={`${msg.sender || 'otro'}: ${msg.text}`} 
-                      secondary={msg.timestamp}
-                      primaryTypographyProps={{ fontSize: 14 }}
-                      secondaryTypographyProps={{ fontSize: 12 }}
-                    />
-                  </ListItem>
-                ))}
-              </List>
-            </Box>
-          ))}
-        </Box>
+        {showHistorial
+          ? <Historial groupedMessages={groupMessagesByDate()} />
+          : <UsersOn users={usuariosActivos} />
+        }
       </Drawer>
 
-      {/* Lista de mensajes en tiempo real */}
+      {/* Aquí va el listado de mensajes y el input para enviar mensajes */}
+
       <Box sx={{ flex: 1, overflowY: 'auto', p: 2 }}>
         <List>
           {messages.map((message, index) => (
@@ -176,7 +154,6 @@ const Chat = () => {
         </List>
       </Box>
 
-      {/* Input para escribir mensaje */}
       <Paper sx={{ p: 2 }}>
         <Box sx={{ display: 'flex', gap: 1 }}>
           <TextField
