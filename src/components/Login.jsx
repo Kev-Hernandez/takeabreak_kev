@@ -37,7 +37,10 @@ const Login = () => {
       });
 
       if (response.ok) {
-        navigate('/chat');
+        const data = await response.json();
+        // Guardar datos del usuario si es necesario
+        localStorage.setItem('user', JSON.stringify(data.usuario));
+        navigate('/users'); // Cambiado de '/chat' a '/users'
       } else {
         const data = await response.json();
         setErrors({ submit: data.mensaje || 'Error en el inicio de sesión' });

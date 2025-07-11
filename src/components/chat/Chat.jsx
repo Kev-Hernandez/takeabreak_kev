@@ -4,10 +4,13 @@ import {
   List, ListItem, ListItemText, Avatar, Drawer 
 } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
+import GroupIcon from '@mui/icons-material/Group';
+import Historial from './Historial';
+import UsersOn from './UsersOn';
 import HistoryIcon from '@mui/icons-material/History';
-import GroupIcon from '@mui/icons-material/Group'; // ícono para Usuarios activos
-import Historial from './Historial'; // Ajusta ruta si está en otra carpeta
-import UsersOn from './UsersOn'; // Importa UsersOn (ajusta ruta según tu estructura)
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import { useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 
 const Chat = () => {
   const [userId, setUserId] = useState('665123456789abcd0123abcd'); // kenia
@@ -15,13 +18,14 @@ const Chat = () => {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [showHistorial, setShowHistorial] = useState(true); // controla si muestra historial o usuarios
+  const [showHistorial, setShowHistorial] = useState(true);
   const [usuariosActivos, setUsuariosActivos] = useState([
     { nombre: 'Ana' },
     { nombre: 'Carlos' },
     { email: 'otro@correo.com' }
   ]);
   const [socket, setSocket] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const socket = new WebSocket('ws://localhost:5000');
@@ -70,11 +74,27 @@ const Chat = () => {
     return grouped;
   };
 
+  const handleSelectUser = (selectedUser) => {
+    setRecipientId(selectedUser._id);
+    setDrawerOpen(false); // Cerrar el drawer después de seleccionar
+  };
+
+  const handleProfileClick = () => {
+    navigate('/profile');
+  };
+
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
       <Paper sx={{ p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Typography variant="h6">Take a Break - Chat</Typography>
         <Box sx={{ display: 'flex', gap: 1 }}>
+          <Button 
+            onClick={handleProfileClick}
+            startIcon={<AccountCircleIcon />}
+            variant="outlined"
+          >
+            Actualizar Perfil
+          </Button>
           <Button 
             onClick={() => {
               setShowHistorial(true);
@@ -104,12 +124,14 @@ const Chat = () => {
         onClose={() => setDrawerOpen(false)}
       >
         {showHistorial
-          ? <Historial groupedMessages={groupMessagesByDate()} />
-          : <UsersOn users={usuariosActivos} />
-        }
+          ? <Historial messages={messages} />
+          : <UsersOn 
+              users={usuariosActivos} 
+              onSelectUser={handleSelectUser}
+              currentUserId={userId}
+            />
+      }
       </Drawer>
-
-      {/* Aquí va el listado de mensajes y el input para enviar mensajes */}
 
       <Box sx={{ flex: 1, overflowY: 'auto', p: 2 }}>
         <List>

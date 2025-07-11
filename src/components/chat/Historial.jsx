@@ -1,9 +1,25 @@
 import React from 'react';
 import { Box, Typography, List, ListItem, ListItemText } from '@mui/material';
-const Historial = ({ groupedMessages }) => {
+import HistoryIcon from '@mui/icons-material/History';
+
+const Historial = ({ messages }) => {
+  const groupMessagesByDate = () => {
+    const grouped = {};
+    messages.forEach(msg => {
+      if (!grouped[msg.date]) grouped[msg.date] = [];
+      grouped[msg.date].push(msg);
+    });
+    return grouped;
+  };
+
+  const groupedMessages = groupMessagesByDate();
+
   return (
     <Box sx={{ p: 2, width: 300 }}>
-      <Typography variant="h6" sx={{ mb: 2 }}>Historial de Mensajes</Typography>
+      <Typography variant="h6" sx={{ mb: 2 }}>
+        <HistoryIcon sx={{ verticalAlign: 'middle', mr: 1 }} />
+        Historial de Mensajes
+      </Typography>
       {Object.keys(groupedMessages).length === 0 ? (
         <Typography variant="body2">No hay mensajes en el historial.</Typography>
       ) : (
