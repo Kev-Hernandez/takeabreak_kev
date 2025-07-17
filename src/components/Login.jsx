@@ -32,7 +32,7 @@ const Login = () => {
         },
         body: JSON.stringify({
           email: formData.correo,
-          contraseña: formData.contraseña,
+          password: formData.contraseña,
         }),
       });
 

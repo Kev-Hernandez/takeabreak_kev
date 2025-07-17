@@ -13,7 +13,7 @@ const Register = () => {
     nombre: '',
     apellido: '',
     email: '',
-    contraseña: '',
+    password: '',
     edad: '',
     sexo: ''
   });
@@ -34,10 +34,10 @@ const Register = () => {
       newErrors.email = 'Correo inválido';
     }
 
-    if (!formData.contraseña) newErrors.contraseña = 'La contraseña es requerida';
-    else if (formData.contraseña.length < 8) newErrors.contraseña = 'Debe tener al menos 8 caracteres';
-    else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])/.test(formData.contraseña)) {
-      newErrors.contraseña = 'Debe tener mayúscula, minúscula, número y símbolo';
+    if (!formData.password) newErrors.password = 'La contraseña es requerida';
+    else if (formData.password.length < 8) newErrors.password = 'Debe tener al menos 8 caracteres';
+    else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])/.test(formData.password)) {
+      newErrors.password = 'Debe tener mayúscula, minúscula, número y símbolo';
     }
 
     if (!formData.edad) newErrors.edad = 'La edad es requerida';
@@ -58,7 +58,7 @@ const Register = () => {
           nombre: formData.nombre,
           apellido: formData.apellido,
           email: formData.email,
-          contraseña: formData.contraseña,
+          password: formData.password,
           edad: Number(formData.edad),
           sexo: formData.sexo,
           preferences: {
@@ -97,7 +97,6 @@ const Register = () => {
 
   return (
     <Box className="register-box">
-      {/* Formas decorativas */}
       <div className="decorative-shape shape-1"></div>
       <div className="decorative-shape shape-2"></div>
       <div className="decorative-shape shape-3"></div>
@@ -158,12 +157,12 @@ const Register = () => {
               required
               fullWidth
               label="Contraseña"
-              name="contraseña"
+              name="password"
               type="password"
-              value={formData.contraseña}
+              value={formData.password}
               onChange={handleChange}
-              error={!!errors.contraseña}
-              helperText={errors.contraseña}
+              error={!!errors.password}
+              helperText={errors.password}
               className="register-input"
             />
             <TextField
