@@ -73,6 +73,7 @@ const Login = () => {
           src={monitorange} 
           alt="Muñeco-head" 
           className="character-loginimage"
+          style={{ maxHeight: '200px' }}
         />
         <Paper elevation={0} className="MuiPaper-root login-paper">
           <Typography className="MuiTypography-root login-title">

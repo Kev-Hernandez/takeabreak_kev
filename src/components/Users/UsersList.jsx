@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
   Box,
+  Grid,
   Paper,
   List,
   ListItem,
@@ -81,20 +82,27 @@ const UsersList = () => {
     setOpenProfile(false);
   };
 
-  return (
+return (
   <Box
-    sx={{
-      maxWidth: 720,
-      margin: '30px auto',
-      p: 4,
-      bgcolor: '#f9f9fb',
-      borderRadius: 3,
-      boxShadow: '0 8px 20px rgba(0,0,0,0.12)',
-      display: 'flex',
-      flexDirection: 'column',
-      gap: 4,
-    }}
-  >
+  sx={{
+    width: '95%', // Cambiado de vw a % para mejor control
+    maxWidth: '1200px',
+    margin: '20px auto', // Margen vertical fijo
+    px: { xs: 1, sm: 2, md: 3 },
+    py: { xs: 1.5, sm: 2 }, // Padding vertical reducido
+    bgcolor: '#f9f9fb',
+    borderRadius: 3,
+    boxShadow: '0 4px 12px rgba(0,0,0,0.12)',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: { xs: 2, sm: 2.5 }, // Gap reducido
+    flex: '0 1 auto', // No crecer más allá de su contenido
+    overflow: 'visible', // Quitamos el scroll interno
+    boxSizing: 'border-box',
+    alignSelf: 'center', // Centrado adicional
+    maxHeight: 'calc(100vh - 40px)', // Altura máxima menos márgenes
+  }}
+>
     {/* Navegación superior */}
     <Box sx={{ display: 'flex', justifyContent: 'center', gap: 4 }}>
       <Button
@@ -179,113 +187,171 @@ const UsersList = () => {
     />
 
     {/* Lista de usuarios (chats privados) */}
-    <Paper
-      elevation={6}
-      sx={{
-        p: 3,
-        borderRadius: 3,
-        bgcolor: 'white',
-        boxShadow: '0 10px 30px rgba(0,0,0,0.12)',
+
+      <Paper
+  elevation={6}
+  sx={{
+    p: { xs: 1, sm: 2 },
+    borderRadius: 3,
+    bgcolor: 'white',
+    boxShadow: '0 6px 20px rgba(0,0,0,0.12)',
+    overflow: 'hidden',
+    flex: 1,
+    display: 'flex',
+    flexDirection: 'column',
+  }}
+>
+  <Typography
+    variant="h5"
+    sx={{
+      mb: 2,
+      color: '#0d47a1',
+      fontWeight: 'bold',
+      letterSpacing: 1,
+    }}
+  >
+    Chats Privados
+  </Typography>
+
+  <Divider sx={{ mb: 3 }} />
+
+  {filteredUsers.length === 0 ? (
+    <Typography
+      variant="body1"
+      sx={{ 
+        textAlign: 'center', 
+        py: 4, 
+        color: '#555',
+        flex: 1,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
       }}
     >
-      <Typography
-        variant="h5"
-        sx={{
-          mb: 2,
-          color: '#0d47a1',
-          fontWeight: 'bold',
-          letterSpacing: 1,
-        }}
-      >
-        Chats Privados
-      </Typography>
-
-      <Divider sx={{ mb: 3 }} />
-
-      {loading ? (
-        <Box sx={{ display: 'flex', justifyContent: 'center', py: 5 }}>
-          <CircularProgress color="primary" size={36} />
-        </Box>
-      ) : filteredUsers.length === 0 ? (
-        <Typography
-          variant="body1"
-          sx={{ textAlign: 'center', py: 4, color: '#555' }}
-        >
-          No hay usuarios activos en este momento
-        </Typography>
-      ) : (
-        <List>
-          {filteredUsers.map((user) => (
-            <ListItem
-              key={user._id}
-              button
-              onClick={() => navigate(`/chat/${user._id}`)}
-              sx={{
-                mb: 2,
-                borderRadius: 3,
-                transition: 'background-color 0.25s ease, box-shadow 0.25s ease',
-                boxShadow: '0 1px 4px rgba(0,0,0,0.08)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                '&:hover': {
-                  backgroundColor: '#e8f0fe',
-                  boxShadow: '0 6px 16px rgba(25, 118, 210, 0.25)',
-                },
+      No hay usuarios activos en este momento
+    </Typography>
+  ) : (
+    <Box sx={{ 
+      width: '100%',
+      overflowX: 'auto',
+      '-webkit-overflow-scrolling': 'touch',
+      '&::-webkit-scrollbar': { height: '8px' },
+      '&::-webkit-scrollbar-thumb': { 
+        backgroundColor: '#1976d2', 
+        borderRadius: '4px' 
+      },
+      pb: 2
+    }}>
+      {/* Contenedor principal del carrusel con 2 filas */}
+      <Box sx={{
+        display: 'inline-grid',
+        gridAutoFlow: 'column',
+        gridTemplateRows: 'repeat(2, auto)',
+        gap: 3,
+        px: 1,
+      }}>
+        {filteredUsers.map((user) => (
+          <Paper
+            key={user._id}
+            elevation={3}
+            sx={{
+              width: 180, // Ancho ligeramente mayor para mejor visualización
+              p: 2,
+              borderRadius: 3,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              textAlign: 'center',
+              transition: 'all 0.3s ease',
+              '&:hover': {
+                transform: 'translateY(-5px)',
+                boxShadow: '0 10px 20px rgba(0,0,0,0.15)'
+              }
+            }}
+          >
+            {/* Badge con estado de conexión */}
+            <Badge
+              overlap="circular"
+              anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+              variant="dot"
+              color={isUserOnline(user) ? 'success' : 'default'}
+              sx={{ 
+                '& .MuiBadge-badge': {
+                  boxShadow: '0 0 0 2px white',
+                }
               }}
             >
-              <ListItemAvatar>
-                <Badge
-                  overlap="circular"
-                  anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-                  variant="dot"
-                  color={isUserOnline(user) ? 'success' : 'default'}
-                  sx={{ boxShadow: '0 0 0 2px white' }}
-                >
-                  <Avatar
-                    src={user.fotoUrl || ''}
-                    alt={`${user.nombre} ${user.apellido}`}
-                    sx={{ bgcolor: '#1565c0', fontWeight: '700' }}
-                  >
-                    {!user.fotoUrl && getInitials(user)}
-                  </Avatar>
-                </Badge>
-              </ListItemAvatar>
-              <ListItemText
-                primary={`${user.nombre} ${user.apellido}`}
-                secondary={user.email}
-                sx={{ ml: 3 }}
-              />
-              <Button
-                variant="outlined"
-                size="small"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  navigate(`/chat/${user._id}`);
-                }}
-                sx={{
-                  borderRadius: 4,
-                  px: 3,
-                  fontWeight: '600',
-                  color: '#1565c0',
-                  borderColor: '#1565c0',
-                  transition: 'all 0.3s ease',
-                  '&:hover': {
-                    bgcolor: '#1565c0',
-                    color: 'white',
-                    borderColor: '#1565c0',
-                    boxShadow: '0 6px 12px rgba(21, 101, 192, 0.7)',
-                    transform: 'scale(1.05)',
-                  },
+              <Avatar
+                src={user.fotoUrl || ''}
+                sx={{ 
+                  width: 64, 
+                  height: 64, 
+                  bgcolor: '#1565c0',
+                  fontWeight: 700,
+                  fontSize: '1.4rem'
                 }}
               >
-                Chatear
-              </Button>
-            </ListItem>
-          ))}
-        </List>
-      )}
-    </Paper>
+                {!user.fotoUrl && getInitials(user)}
+              </Avatar>
+            </Badge>
+
+            {/* Nombre completo */}
+            <Typography 
+              variant="subtitle1" 
+              fontWeight="bold" 
+              sx={{ 
+                mt: 1.5,
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                maxWidth: '100%'
+              }}
+            >
+              {user.nombre} {user.apellido}
+            </Typography>
+
+            {/* Email */}
+            <Typography 
+              variant="body2" 
+              color="text.secondary"
+              sx={{
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                maxWidth: '100%'
+              }}
+            >
+              {user.email}
+            </Typography>
+
+            {/* Botón de chat */}
+            <Button
+              variant="outlined"
+              size="small"
+              onClick={() => navigate(`/chat/${user._id}`)}
+              sx={{
+                mt: 2,
+                borderRadius: 4,
+                px: 3,
+                fontWeight: '600',
+                color: '#1565c0',
+                borderColor: '#1565c0',
+                transition: 'all 0.3s ease',
+                '&:hover': {
+                  bgcolor: '#1565c0',
+                  color: 'white',
+                  boxShadow: '0 6px 12px rgba(21, 101, 192, 0.3)',
+                }
+              }}
+            >
+              Chatear
+            </Button>
+          </Paper>
+        ))}
+      </Box>
+    </Box>
+  )}
+</Paper>
 
     {/* Modal de perfil */}
     <Dialog
@@ -302,17 +368,19 @@ const UsersList = () => {
           animation: 'fadeIn 0.3s ease-in-out',
         },
       }}
-    ><DialogTitle>
-  <IconButton
-    aria-label="close"
-    onClick={handleCloseProfile}
-    sx={{ position: 'absolute', right: 8, top: 8 }}
-  > <CloseIcon />
-  </IconButton>
+    >
+      <DialogTitle>
+        <IconButton
+          aria-label="close"
+          onClick={handleCloseProfile}
+          sx={{ position: 'absolute', right: 8, top: 8 }}
+        >
+          <CloseIcon />
+        </IconButton>
       </DialogTitle>
-        <DialogContent>
-            <Profile />
-        </DialogContent>
+      <DialogContent>
+        <Profile />
+      </DialogContent>
     </Dialog>
   </Box>
 );

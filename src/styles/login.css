@@ -1,14 +1,13 @@
 /* Contenedor general */
 .MuiBox-root.login-box {
-  min-height: 100vh;
+  height: 100vh;
   display: flex;
   justify-content: center;
-  align-items: flex-start;
-  padding: 40px 16px;
-  overflow-y: auto;
-  position: relative;
-  box-sizing: border-box;
+  align-items: center; /* Centrado vertical */
+  padding: 20px 16px; /* 20px arriba/abajo, 16px laterales */
   background-color: transparent;
+  overflow: hidden;
+  box-sizing: border-box;
 }
 
 /* Contenedor del contenido */
@@ -17,30 +16,31 @@
   flex-direction: column;
   align-items: center;
   width: 100%;
-  max-width: 90vw;
-  padding-bottom: 40px;
+  max-width: 500px; /* Reducido de 90vw */
+  padding: 20px;
   box-sizing: border-box;
+  position: relative;
+  z-index: 2;
 }
 
 /* Imagen decorativa */
 .character-loginimage {
-  width: 100%;
+  width: auto;
   max-width: 260px;
-  height: auto;
-  margin: 20px auto 0 auto;
-  display: block;
-  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
-  transition: all 0.3s ease-in-out;
+  max-height: 180px; /* Añadido límite de altura */
+  margin: 0 auto 20px auto; /* Margen reducido arriba */
+  object-fit: contain;
 }
 
 /* Paper del formulario */
 .MuiPaper-root.login-paper {
   width: 100%;
-  max-width: 600px;
+  max-width: 100%; /* Cambiado de 600px */
   background-color: rgba(14, 12, 13, 0.774) !important;
   border-radius: 16px !important;
-  padding: 32px !important;
+  padding: 30px !important;
   box-sizing: border-box;
+  overflow: hidden;
 }
 
 /* Títulos */

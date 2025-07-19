@@ -102,11 +102,7 @@ const Register = () => {
       <div className="decorative-shape shape-3"></div>
       <div className="decorative-shape shape-4"></div>
       <Container maxWidth="xs" className="register-container">
-        <img 
-          src={monitolibro} 
-          alt="Muñeco-head" 
-          className="character-registerimage"
-        />
+        
         <Paper elevation={0} className="register-paper">
           <Typography component="h1" variant="h3" align="center" className="register-title">
             Take a Break

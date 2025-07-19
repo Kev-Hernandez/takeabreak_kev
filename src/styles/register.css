@@ -1,14 +1,13 @@
 /* Contenedor general */
 .MuiBox-root.register-box {
-  min-height: 100vh;
+  height: 100vh;
   display: flex;
   justify-content: center;
-  align-items: flex-start;
-  padding: 40px 16px;
-  overflow-y: auto;
-  position: relative;
-  box-sizing: border-box;
+  align-items: center; /* Centrado vertical */
+  padding: 20px 16px; /* 20px arriba/abajo, 16px laterales */
   background-color: transparent;
+  overflow: hidden;
+  box-sizing: border-box;
 }
 
 /* Contenedor del contenido */
@@ -16,32 +15,38 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 100%;
-  max-width: 90vw;
-  padding-bottom: 40px;
+  width: 80%;
+  max-width: 320px;
+  padding: 16px;
   box-sizing: border-box;
+  margin: 0 auto;
+  background-color: transparent;
+  position: relative;
+  z-index: 2;
+  transform: scale(0.9);
+  transform-origin: center;
+  max-height: 100%; /* Aseguramos que no exceda la altura */
 }
 
 /* Imagen decorativa */
 .character-registerimage {
-  width: 100%;
-  max-width: 260px;
-  height: auto;
-  margin: 20px auto 0 auto;
+  width: 160px; /* Mantiene buen tamaño */
+  height: 160px;
+  object-fit: contain;
+  margin: 10px auto 10px auto; /* 10px arriba y abajo */
   display: block;
-  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
-  transition: all 0.3s ease-in-out;
 }
 
 /* Contenedor del formulario */
 .MuiPaper-root.register-paper {
   width: 100%;
-  max-width: 600px;
   background-color: rgba(14, 12, 13, 0.774) !important;
   border-radius: 16px !important;
-  padding: 32px !important;
-  box-sizing: border-box;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  padding: 24px !important; /* Añadido valor faltante */
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15) !important;
+  overflow: visible; /* Cambiado de hidden a visible */
+  margin-top: auto;
+  margin-bottom: auto;
 }
 
 /* Títulos */
