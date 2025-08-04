@@ -21,11 +21,30 @@ const Chat = ({ recipientUser }) => {
   useEffect(() => {
     if (recipientUser?._id) {
       setRecipientId(recipientUser._id);
+      // Cargar historial de chat cuando se selecciona un usuario
+      fetchChatHistory(recipientUser._id);
     } else {
       setRecipientId(null);
     }
   }, [recipientUser]);
 
+  const fetchChatHistory = async (recipientId) => {
+    try {
+      const response = await fetch(`http://localhost:3001/api/web/chat/history/${userId}/${recipientId}`);
+      if (!response.ok) throw new Error('Error al obtener historial');
+      const data = await response.json();
+      const formattedMessages = data.mensajes.map(msg => ({
+        remitenteId: msg.remitenteId,
+        text: msg.texto,
+        timestamp: new Date(msg.fecha).toLocaleTimeString(),
+        date: new Date(msg.fecha).toLocaleDateString(),
+        sender: msg.remitenteId === userId ? 'user' : 'otro'
+      }));
+      setMessages(formattedMessages);
+    } catch (error) {
+      console.error('Error fetching chat history:', error);
+    }
+  };
   useEffect(() => {
     const socket = new WebSocket('ws://localhost:5000');
     socket.onopen = () => console.log('✅ Conectado al WebSocket');
