@@ -38,7 +38,7 @@ const Profile = () => {
         const idUsuario = localStorage.getItem('idUsuario');
         if (!idUsuario) throw new Error('No user ID found');
 
-        const res = await axios.get(`http://localhost:3001/api/usuarios/${idUsuario}`);
+        const res = await axios.get(`http://localhost:3001/api/web/usuarios/${idUsuario}`);
         const data = res.data;
 
         setProfile({
@@ -81,7 +81,7 @@ const Profile = () => {
         updateData.password = profile.password;
       }
 
-      await axios.put(`http://localhost:3001/api/usuarios/${idUsuario}`, updateData);
+      await axios.put(`http://localhost:3001/api/web/usuarios/${idUsuario}`, updateData);
 
       showSnackbar('Perfil actualizado con éxito', 'success');
       setProfile((prev) => ({ ...prev, password: '' }));

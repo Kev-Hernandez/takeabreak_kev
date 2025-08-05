@@ -40,6 +40,8 @@ const Login = () => {
         const data = await response.json();
         // Guardar datos del usuario si es necesario
         localStorage.setItem('user', JSON.stringify(data.usuario));
+        localStorage.setItem('idUsuario', data.usuario._id || data.usuario.id);
+        console.log('Usuario recibido del backend:', data.usuario);
         navigate('/users'); // Cambiado de '/chat' a '/users'
       } else {
         const data = await response.json();
