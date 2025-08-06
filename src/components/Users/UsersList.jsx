@@ -6,20 +6,32 @@ import {
   TextField,
   Avatar,
   Dialog,
-  DialogTitle,
   DialogContent,
   IconButton,
   Drawer,
+  InputAdornment,
+  Badge,
+  AppBar,
+  Toolbar,
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+
 import CloseIcon from '@mui/icons-material/Close';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import HomeIcon from '@mui/icons-material/Home';
 import MenuIcon from '@mui/icons-material/Menu';
 import GroupIcon from '@mui/icons-material/Group';
+
+// Íconos que te faltaban importar
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
+import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
+import ChatBubbleIcon from '@mui/icons-material/ChatBubble';
+import SearchIcon from '@mui/icons-material/Search';
+
 import Profile from './Profile';
 import Chat from '../chat/Chat';
-import UsersOn from '../chat/UsersOn'; // Asegúrate que la ruta sea correcta
+import UsersOn from '../chat/UsersOn';
+ // Asegúrate que la ruta sea correcta
 
 const UsersList = () => {
   const [users, setUsers] = useState([]);
@@ -83,222 +95,297 @@ const UsersList = () => {
     handleCloseDrawer();
   };
 
+  
+
   return (
+  <Box
+    sx={{
+      display: 'flex',
+      width: '100%',
+      height: '100vh',
+      overflow: 'hidden',
+      bgcolor: 'background.default',
+    }}
+  >
+    {/* MENÚ LATERAL - ESTILO MINIMALISTA */}
     <Box
       sx={{
+        width: menuOpen ? 240 : 72,
+        bgcolor: 'primary.dark',
+        p: 2,
         display: 'flex',
-        flexDirection: 'row',
-        width: '100%',
-        height: '100vh',
-        overflow: 'hidden',
-        bgcolor: '#f3f3e5ff',
+        flexDirection: 'column',
+        alignItems: menuOpen ? 'flex-start' : 'center',
+        gap: 1,
+        transition: 'width 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+        boxShadow: '2px 0 12px rgba(0,0,0,0.1)',
+        zIndex: 10,
       }}
     >
-      {/* MENÚ LATERAL HAMBURGUESA */}
-      <Box
+      <IconButton
+        onClick={() => setMenuOpen(!menuOpen)}
         sx={{
-          width: menuOpen ? 220 : 60,
-          bgcolor: '#f3f3e5ff',
-          p: 1,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: menuOpen ? 'flex-start' : 'center',
-          gap: 3,
-          boxShadow: '2px 0 6px rgba(0,0,0,0.1)',
-          transition: 'width 0.3s ease',
+          mb: 2,
+          color: 'common.white',
+          alignSelf: menuOpen ? 'flex-end' : 'center',
+          '&:hover': {
+            bgcolor: 'rgba(255,255,255,0.1)'
+          }
         }}
       >
-        <Box
-          sx={{
-            mt: 2,
-            mb: 2,
-            cursor: 'pointer',
-            display: 'flex',
-            justifyContent: menuOpen ? 'flex-end' : 'center',
-            width: '100%',
-            color: '#1976d2',
-          }}
-          onClick={() => setMenuOpen(!menuOpen)}
-          title={menuOpen ? 'Cerrar menú' : 'Abrir menú'}
-        >
-          <MenuIcon />
-        </Box>
+        {menuOpen ? <ChevronLeftIcon /> : <MenuIcon />}
+      </IconButton>
 
+      {[
+        { icon: <HomeIcon />, text: 'Inicio', action: () => navigate('/') },
+        { icon: <AccountCircleIcon />, text: 'Perfil', action: handleOpenProfile },
+        { icon: <GroupIcon />, text: 'Usuarios activos', action: handleOpenActiveUsers }
+      ].map((item, index) => (
         <Button
-          startIcon={<HomeIcon />}
+          key={index}
+          startIcon={item.icon}
           variant="text"
-          onClick={() => navigate('/')}
+          onClick={item.action}
           sx={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: menuOpen ? 'flex-start' : 'center',
             width: '100%',
-            px: menuOpen ? 4 : 0,
-          }}
-          title="Inicio"
-        >
-          {menuOpen && 'Inicio'}
-        </Button>
-
-        <Button
-          startIcon={<AccountCircleIcon />}
-          variant="text"
-          onClick={handleOpenProfile}
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
+            px: menuOpen ? 2 : 1,
+            py: 1.5,
             justifyContent: menuOpen ? 'flex-start' : 'center',
-            width: '100%',
-            px: menuOpen ? 4 : 0,
+            color: 'common.white',
+            borderRadius: 2,
+            '&:hover': {
+              bgcolor: 'rgba(255,255,255,0.1)'
+            }
           }}
-          title="Perfil"
         >
-          {menuOpen && 'Perfil'}
+          {menuOpen && (
+            <Typography variant="body2" sx={{ ml: 1, fontWeight: 500 }}>
+              {item.text}
+            </Typography>
+          )}
         </Button>
+      ))}
+    </Box>
 
-        <Button
-          startIcon={<GroupIcon />}
-          variant="text"
-          onClick={handleOpenActiveUsers}
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: menuOpen ? 'flex-start' : 'center',
-            width: '100%',
-            px: menuOpen ? 4 : 0,
-          }}
-          title="Usuarios activos"
-        >
-          {menuOpen && 'Usuarios activos'}
-        </Button>
-      </Box>
+    {/* COLUMNA DE CHATS - ESTILO MODERNO */}
+    <Box
+      sx={{
+        flex: 1,
+        maxWidth: 380,
+        p: 3,
+        borderRight: '1px solid',
+        borderColor: 'divider',
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        bgcolor: 'background.paper',
+      }}
+    >
+      <Typography variant="h6" sx={{ 
+        mb: 3, 
+        fontWeight: 600,
+        color: 'text.primary',
+        display: 'flex',
+        alignItems: 'center',
+        gap: 1
+      }}>
+        <ChatBubbleOutlineIcon /> Chats
+      </Typography>
 
-      {/* COLUMNA CENTRAL: CHATS */}
-      <Box
-        sx={{
-          flex: 1,
-          maxWidth: 360,
-          p: 2,
-          borderRight: '1px solid #ddd',
-          height: '100vh',
-          display: 'flex',
-          flexDirection: 'column',
+      <TextField
+        label="Buscar contactos"
+        variant="outlined"
+        size="small"
+        fullWidth
+        sx={{ 
+          mb: 3,
+          '& .MuiOutlinedInput-root': {
+            borderRadius: 3,
+            bgcolor: 'background.default'
+          }
         }}
-      >
-        <Typography variant="h6" sx={{ mb: 2, color: '#333' }}>
-          Chats
-        </Typography>
-
-        <TextField
-          label="Buscar"
-          variant="outlined"
-          size="small"
-          fullWidth
-          sx={{ mb: 2 }}
-          value={searchTerm}
-          onChange={handleSearchChange}
-        />
-
-        <Box sx={{ overflowY: 'auto', flex: 1 }}>
-          {filteredUsers.map((user) => (
-            <Box
-              key={user._id}
-              onClick={() => handleSelectChat(user)}
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 2,
-                px: 2,
-                py: 1.5,
-                mb: 1,
-                borderRadius: 2,
-                cursor: 'pointer',
-                transition: 'background-color 0.3s',
-                '&:hover': {
-                  backgroundColor: '#f5f5f5',
-                },
-              }}
-            >
-              <Avatar src={user.profilePicture} alt={user.nombre} />
-              <Typography variant="body1" sx={{ color: '#333' }}>
-                {user.nombre} {user.apellido}
-              </Typography>
-            </Box>
-          ))}
-        </Box>
-      </Box>
-
-      {/* PANEL DERECHO */}
-      <Box
-        sx={{
-          flex: 1,
-          p: 3,
-          display: 'flex',
-          flexDirection: 'column', // para que Chat pueda crecer verticalmente
-          bgcolor: '#f3f3e5ff',
-          minWidth: 0, // para prevenir overflow
+        InputProps={{
+          startAdornment: (
+            <InputAdornment position="start">
+              <SearchIcon color="action" />
+            </InputAdornment>
+          ),
         }}
-      >
-        {selectedUser ? (
-          <Chat
-            recipientUser={selectedUser}
-            style={{ width: '100%', flex: 1 }}
-          />
-        ) : (
+        value={searchTerm}
+        onChange={handleSearchChange}
+      />
+
+      <Box sx={{ 
+        overflowY: 'auto', 
+        flex: 1,
+        '&::-webkit-scrollbar': {
+          width: '6px',
+        },
+        '&::-webkit-scrollbar-thumb': {
+          bgcolor: 'primary.light',
+          borderRadius: 3,
+        }
+      }}>
+        {filteredUsers.map((user) => (
           <Box
+            key={user._id}
+            onClick={() => handleSelectChat(user)}
             sx={{
-              flex: 1,
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'center',
+              gap: 2,
+              px: 2,
+              py: 1.5,
+              mb: 1,
+              borderRadius: 2,
+              cursor: 'pointer',
+              transition: 'all 0.2s ease',
+              bgcolor: selectedUser?._id === user._id ? 'primary.light' : 'transparent',
+              '&:hover': {
+                bgcolor: selectedUser?._id === user._id ? 'primary.light' : 'action.hover',
+              },
             }}
           >
-            <Typography variant="h5" color="text.secondary">
-              Selecciona un usuario para comenzar a chatear.
-            </Typography>
+            <Badge
+              overlap="circular"
+              anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+              variant="dot"
+              color="success"
+              sx={{
+                '& .MuiBadge-badge': {
+                  boxShadow: '0 0 0 2px white',
+                }
+              }}
+            >
+              <Avatar 
+                src={user.profilePicture} 
+                alt={user.nombre}
+                sx={{ 
+                  width: 48, 
+                  height: 48,
+                  bgcolor: 'primary.main',
+                }}
+              />
+            </Badge>
+            {menuOpen && (
+              <Box sx={{ overflow: 'hidden' }}>
+                <Typography variant="subtitle2" noWrap sx={{ color: 'black' }}>
+                  {user.nombre} {user.apellido}
+                </Typography>
+                <Typography variant="caption" color="text.secondary" noWrap>
+                  {user.lastMessage || 'Chatear'}
+                </Typography>
+              </Box>
+            )}
+            {!menuOpen && (
+              <Box sx={{ overflow: 'hidden' }}>
+                <Typography variant="subtitle2" noWrap sx={{ color: 'black' }}>
+                  {user.nombre} {user.apellido}
+                </Typography>
+                <Typography variant="caption" color="text.secondary" noWrap>
+                  {user.lastMessage || 'Chatear'}
+                </Typography>
+              </Box>
+            )}
           </Box>
-        )}
+        ))}
       </Box>
-
-      {/* MODAL DE PERFIL */}
-      <Dialog
-        open={openProfile}
-        onClose={handleCloseProfile}
-        maxWidth="sm"
-        fullWidth
-        PaperProps={{
-          sx: {
-            borderRadius: 4,
-            p: 2,
-            bgcolor: '#f3f3e5ff',
-            boxShadow: '0 10px 40px rgba(0,0,0,0.25)',
-          },
-        }}
-      >
-        <DialogTitle>
-          <IconButton
-            aria-label="close"
-            onClick={handleCloseProfile}
-            sx={{ position: 'absolute', right: 8, top: 8 }}
-          >
-            <CloseIcon />
-          </IconButton>
-        </DialogTitle>
-        <DialogContent>
-          <Profile />
-        </DialogContent>
-      </Dialog>
-
-      {/* DRAWER USUARIOS ACTIVOS */}
-      <Drawer anchor="right" open={drawerOpen} onClose={handleCloseDrawer}>
-        <UsersOn
-          users={filteredUsers}
-          onSelectUser={handleSelectUserFromDrawer}
-          currentUserId={null} // Si tienes el ID del usuario actual, pásalo aquí
-        />
-      </Drawer>
     </Box>
-  );
+
+    {/* ÁREA DE CHAT PRINCIPAL */}
+    <Box
+      sx={{
+        flex: 2,
+        display: 'flex',
+        flexDirection: 'column',
+        bgcolor: 'background.default',
+        position: 'relative',
+      }}
+    >
+      {selectedUser ? (
+        <Chat
+          recipientUser={selectedUser}
+          style={{ flex: 1 }}
+        />
+      ) : (
+        <Box
+          sx={{
+            flex: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            p: 3,
+            textAlign: 'center',
+          }}
+        >
+          <ChatBubbleIcon sx={{ fontSize: 80, color: 'action.disabled', mb: 2 }} />
+          <Typography variant="h5" color="text.secondary" sx={{ mb: 1 }}>
+            Selecciona un chat
+          </Typography>
+          <Typography variant="body1" color="text.disabled">
+            Elige un contacto para comenzar la conversación
+          </Typography>
+        </Box>
+      )}
+    </Box>
+
+{/* MODAL DE PERFIL - FONDO TRANSPARENTE */}
+<Dialog
+  open={openProfile}
+  onClose={handleCloseProfile}
+  PaperProps={{
+    sx: {
+      borderRadius: 4,
+      overflow: 'hidden',
+      backgroundColor: 'transparent',  // fondo transparente
+      boxShadow: 'none',                // quitar sombra para mayor transparencia
+    },
+  }}
+  BackdropProps={{
+    sx: {
+      backgroundColor: 'rgba(0, 0, 0, 0.57)', // opcional: fondo oscuro semi-transparente detrás del modal
+    },
+  }}
+>
+  <Profile />
+</Dialog>
+
+    {/* DRAWER USUARIOS ACTIVOS - ESTILO MODERNO */}
+    <Drawer 
+      anchor="right" 
+      open={drawerOpen} 
+      onClose={handleCloseDrawer}
+      PaperProps={{
+        sx: {
+          width: 350,
+          p: 3,
+          bgcolor: 'background.paper',
+        }
+      }}
+    >
+      <Box sx={{ 
+        display: 'flex', 
+        alignItems: 'center', 
+        mb: 3,
+        justifyContent: 'space-between'
+      }}>
+        <Typography variant="h6" sx={{ fontWeight: 600 }}>
+          <GroupIcon sx={{ verticalAlign: 'middle', mr: 1 }} />
+          Usuarios activos
+        </Typography>
+        <IconButton onClick={handleCloseDrawer}>
+          <CloseIcon />
+        </IconButton>
+      </Box>
+      <UsersOn
+        users={filteredUsers}
+        onSelectUser={handleSelectUserFromDrawer}
+        currentUserId={null}
+      />
+    </Drawer>
+  </Box>
+);
 };
 
 export default UsersList;
