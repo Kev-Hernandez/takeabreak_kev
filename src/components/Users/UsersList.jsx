@@ -1,19 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {
-  Box,
-  Typography,
-  Button,
-  TextField,
-  Avatar,
-  Dialog,
-  DialogContent,
-  IconButton,
-  Drawer,
-  InputAdornment,
-  Badge,
-  AppBar,
-  Toolbar,
-} from '@mui/material';
+import {Box,Typography,Button,TextField,Avatar,Dialog,DialogContent,IconButton,Drawer,InputAdornment,Badge,AppBar,Toolbar,} from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
 import CloseIcon from '@mui/icons-material/Close';
@@ -31,7 +17,6 @@ import SearchIcon from '@mui/icons-material/Search';
 import Profile from './Profile';
 import Chat from '../chat/Chat';
 import UsersOn from '../chat/UsersOn';
- // Asegúrate que la ruta sea correcta
 
 const UsersList = () => {
   const [users, setUsers] = useState([]);

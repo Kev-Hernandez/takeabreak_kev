@@ -25,7 +25,7 @@ const Login = () => {
     e.preventDefault();
 
     try {
-      const response = await fetch('http://localhost:3001/api/web/auth/login', {
+      const response = await fetch('http://localhost:3001/api/web/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -40,7 +40,7 @@ const Login = () => {
         const data = await response.json();
         // Guardar datos del usuario si es necesario
         localStorage.setItem('user', JSON.stringify(data.usuario));
-        localStorage.setItem('idUsuario', data.usuario._id || data.usuario.id);
+        localStorage.setItem('userId', data.usuario._id || data.usuario.id);
         console.log('Usuario recibido del backend:', data.usuario);
         navigate('/users'); // Cambiado de '/chat' a '/users'
       } else {

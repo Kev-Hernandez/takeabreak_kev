@@ -1,7 +1,5 @@
 import { useState } from 'react';
-import {
-  Box, TextField, Button, Typography, Container, Paper, MenuItem
-} from '@mui/material';
+import {Box, TextField, Button, Typography, Container, Paper, MenuItem} from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import monitolibro from '../assets/monitolibro.png';
 import '../styles/register.css'
@@ -70,7 +68,7 @@ const Register = () => {
 
         console.log("Datos enviados:", dataToSend);
 
-        const response = await fetch('http://localhost:3001/api/web/auth/register', {
+        const response = await fetch('http://localhost:3001/api/web/register', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(dataToSend),

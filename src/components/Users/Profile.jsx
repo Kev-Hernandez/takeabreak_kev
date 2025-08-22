@@ -1,18 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import {
-  Box,
-  Paper,
-  Typography,
-  TextField,
-  Button,
-  Grid,
-  Avatar,
-  Snackbar,
-  Alert,
-  MenuItem,
-  IconButton,
-  InputAdornment,
-} from '@mui/material';
+import {Box,Paper,Typography,TextField,Button,Grid,Avatar,Snackbar,Alert,MenuItem,IconButton,InputAdornment,} from '@mui/material';
 
 import SaveIcon from '@mui/icons-material/Save';
 import PersonIcon from '@mui/icons-material/Person';
@@ -22,16 +9,12 @@ import LockIcon from '@mui/icons-material/Lock';
 
 import axios from 'axios';
 
-
 const Profile = () => {
   const [profile, setProfile] = useState({
     nombre: '',
     apellido: '',
     email: '',
     password: '',
-    descripcion: '',
-    genero: '',
-    avatar: '',
   });
 
   const [snackbar, setSnackbar] = useState({
@@ -40,13 +23,22 @@ const Profile = () => {
     severity: 'success',
   });
 
+  // Función única para mostrar Snackbar
+  const showSnackbar = (message, severity) => {
+    setSnackbar({ open: true, message, severity });
+  };
+
+  const handleCloseSnackbar = () => {
+    setSnackbar({ ...snackbar, open: false });
+  };
+
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const idUsuario = localStorage.getItem('idUsuario');
-        if (!idUsuario) throw new Error('No user ID found');
+        const userId = localStorage.getItem('userId');
+        if (!userId) throw new Error('No se encontró ID de usuario');
 
-        const res = await axios.get(`http://localhost:3001/api/web/usuarios/${idUsuario}`);
+        const res = await axios.get(`http://localhost:3001/api/web/profile/${userId}`);
         const data = res.data;
 
         setProfile({
@@ -54,9 +46,6 @@ const Profile = () => {
           apellido: data.apellido || '',
           email: data.email || '',
           password: '',
-          descripcion: data.descripcion || '',
-          genero: data.genero || '',
-          avatar: data.avatar || '',
         });
       } catch (error) {
         console.error('Error fetching profile:', error);
@@ -75,21 +64,19 @@ const Profile = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const idUsuario = localStorage.getItem('idUsuario');
-      if (!idUsuario) throw new Error('No user ID found');
+      const userId = localStorage.getItem('userId');
+      if (!userId) throw new Error('No user ID found');
 
       const updateData = {
         nombre: profile.nombre,
         apellido: profile.apellido,
         email: profile.email,
-        descripcion: profile.descripcion,
-        genero: profile.genero,
       };
-      if (profile.password) {
+      if (profile.password) {   
         updateData.password = profile.password;
       }
 
-      await axios.put(`http://localhost:3001/api/web/usuarios/${idUsuario}`, updateData);
+      await axios.put(`http://localhost:3001/api/web/profile/${userId}`, updateData);
 
       showSnackbar('Perfil actualizado con éxito', 'success');
       setProfile((prev) => ({ ...prev, password: '' }));
@@ -98,10 +85,6 @@ const Profile = () => {
       console.error('Error updating profile:', error);
       showSnackbar('Error al actualizar el perfil', 'error');
     }
-  };
-
-  const showSnackbar = (message, severity) => {
-    setSnackbar({ open: true, message, severity });
   };
 
   return (
@@ -208,9 +191,6 @@ const Profile = () => {
           <Typography variant="h6" sx={{ fontWeight: 600, mt: 1, fontSize: { xs: '1.1rem', md: '1.25rem' } }}>
             {profile.nombre} {profile.apellido}
           </Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ fontSize: { xs: '0.8rem', md: '0.875rem' } }}>
-            {profile.genero || 'Sin especificar'}
-          </Typography>
         </Grid>
 
         {/* Columna derecha - Formulario */}
@@ -309,50 +289,7 @@ const Profile = () => {
               />
             </Grid>
 
-            {/* Género */}
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                select
-                label="Género"
-                name="genero"
-                value={profile.genero}
-                onChange={handleChange}
-                variant="outlined"
-                size="small"
-                sx={{ 
-                  '& .MuiSelect-select': {
-                    fontSize: { xs: '0.875rem', sm: '0.9375rem' }
-                  }
-                }}
-              >
-                <MenuItem value="Masculino">Masculino</MenuItem>
-                <MenuItem value="Femenino">Femenino</MenuItem>
-                <MenuItem value="Otro">Otro</MenuItem>
-                <MenuItem value="Prefiero no decir">Prefiero no decir</MenuItem>
-              </TextField>
-            </Grid>
-
-            {/* Descripción */}
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="Descripción"
-                name="descripcion"
-                multiline
-                rows={3} // Reducido de 4 a 3 para ahorrar espacio
-                value={profile.descripcion}
-                onChange={handleChange}
-                variant="outlined"
-                size="small"
-                helperText="Cuéntanos algo sobre ti"
-                sx={{ 
-                  '& .MuiInputBase-input': {
-                    fontSize: { xs: '0.875rem', sm: '0.9375rem' }
-                  }
-                }}
-              />
-            </Grid>
+  
 
             {/* Botón Guardar */}
             <Grid item xs={12} sx={{ mt: 1 }}>
