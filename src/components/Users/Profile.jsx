@@ -1,30 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import {
-  Box,
-  Paper,
-  Typography,
-  TextField,
-  Button,
-  Grid,
-  Avatar,
-  Snackbar,
-  Alert,
-  MenuItem,
-  IconButton,
-  InputAdornment,
-  Dialog, // Componente para el pop-up
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Slide, // Para la animación de entrada
-} from '@mui/material';
-
+import {Box,Paper,Typography,TextField,Button,Grid,Avatar,Snackbar,Alert,MenuItem,IconButton,InputAdornment,Dialog,DialogTitle,DialogContent,DialogActions,Slide} from '@mui/material';
 import SaveIcon from '@mui/icons-material/Save';
 import EmailIcon from '@mui/icons-material/Email';
 import LockIcon from '@mui/icons-material/Lock';
 import EditIcon from '@mui/icons-material/Edit'; // Icono para editar el avatar
 import CloseIcon from '@mui/icons-material/Close'; // Icono para cerrar
-
 import axios from 'axios';
 
 // Define la URL base de tu API para no repetirla
@@ -58,7 +38,7 @@ const Profile = () => {
   useEffect(() => {
     const fetchProfileAndAvatars = async () => {
       try {
-        const idUsuario = localStorage.getItem('idUsuario');
+        const idUsuario = sessionStorage.getItem('idUsuario');
         if (!idUsuario) throw new Error('No se encontró el ID del usuario');
 
         const [profileRes, avatarsRes] = await Promise.all([
