@@ -1,27 +1,31 @@
-// importacion de las rutas del proyecto
+// src/App.jsx
+
 import { Routes, Route } from 'react-router-dom';
-import Profile from './components/Users/Profile';
-import Home from './components/Home';
-import Login from './components/Login';
-import Register from './components/Register';
-import Chat from './components/chat/Chat';
-import UsersList from './components/Users/UsersList';
-import ProtectedRoute from './middleware/protectedViws';
+
+// 1. Importaciones actualizadas a los nuevos componentes de página
+import HomePage from './pages/HomePage';
+import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
+import DashboardPage from './pages/DashboardPage';
+import ProtectedRoute from './middleware/ProtectedRoute';
+
 
 function App() {
   return (
     <Routes>
-      <Route path="/" element={<Home />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
+      {/* --- Rutas Públicas --- */}
+      <Route path="/" element={<HomePage />} />
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/register" element={<RegisterPage />} />
 
-      //rutas protegidas
+      {/* --- Rutas Protegidas --- */}
       <Route element={<ProtectedRoute />}>
-      <Route path="/users" element={<UsersList />} />
-      <Route path="/chat/:userId" element={<Chat />} />
-      <Route path="/profile" element={<Profile />} />
+        {/* La única ruta protegida ahora es el Dashboard, que contiene todo lo demás */}
+        <Route path="/dashboard" element={<DashboardPage />} />
       </Route>
-
+      
+      {/* Puedes agregar una ruta para páginas no encontradas si lo deseas */}
+      {/* <Route path="*" element={<NotFoundPage />} /> */}
     </Routes>
   );
 }

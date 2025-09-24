@@ -3,19 +3,18 @@ import {Box,Paper,Typography,TextField,Button,Grid,Avatar,Snackbar,Alert,MenuIte
 import SaveIcon from '@mui/icons-material/Save';
 import EmailIcon from '@mui/icons-material/Email';
 import LockIcon from '@mui/icons-material/Lock';
-import EditIcon from '@mui/icons-material/Edit'; // Icono para editar el avatar
-import CloseIcon from '@mui/icons-material/Close'; // Icono para cerrar
-import axios from 'axios';
+import EditIcon from '@mui/icons-material/Edit';
+import CloseIcon from '@mui/icons-material/Close';
 
-// Define la URL base de tu API para no repetirla
-const API_BASE_URL = 'http://localhost:3001';
+// 1. Importamos nuestro 'apiClient' en lugar de 'axios'
+import apiClient from '../../../api/apiClient';
 
 // Animación para el diálogo modal
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
-const Profile = () => {
+const ProfileEditor = () => {
   const [profile, setProfile] = useState({
     nombre: '',
     apellido: '',
@@ -27,7 +26,7 @@ const Profile = () => {
   });
 
   const [availableAvatars, setAvailableAvatars] = useState([]);
-  const [isModalOpen, setIsModalOpen] = useState(false); // Estado para controlar el pop-up
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const [snackbar, setSnackbar] = useState({
     open: false,
@@ -35,60 +34,66 @@ const Profile = () => {
     severity: 'success',
   });
 
-  useEffect(() => {
-    const fetchProfileAndAvatars = async () => {
-      try {
-        const idUsuario = sessionStorage.getItem('idUsuario');
-        if (!idUsuario) throw new Error('No se encontró el ID del usuario');
+useEffect(() => {
+  const fetchProfileAndAvatars = async () => {
+    const idUsuario = sessionStorage.getItem('idUsuario');
+    try {
+      if (!idUsuario) throw new Error('No se encontró el ID del usuario');
 
-        const [profileRes, avatarsRes] = await Promise.all([
-          axios.get(`${API_BASE_URL}/api/web/usuarios/${idUsuario}`),
-          axios.get(`${API_BASE_URL}/api/web/avatars`),
-        ]);
-        
-        const profileData = profileRes.data;
-        setProfile(prev => ({
-          ...prev,
-          ...profileData,
-          password: '',
-          avatar: profileData.avatar || '',
-        }));
+      const [profileRes, avatarsRes] = await Promise.all([
+        apiClient.get(`/web/usuarios/${idUsuario}`),
+        apiClient.get(`/web/avatars`),
+      ]);
+      
+      const profileData = profileRes.data;
+      setProfile(prev => ({
+        ...prev,
+        ...profileData,
+        password: '',
+        genero: profileData.genero || '',
+        avatar: profileData.avatar || '',
+      }));
+      
+      // ======================= INICIO DE LA CORRECCIÓN FINAL =======================
+      // Esta línea es el problema. La reemplazamos por una que no incluya '/api'.
+      const SERVER_BASE_URL = 'http://localhost:3001'; 
+      // ======================= FIN DE LA CORRECCIÓN FINAL =======================
 
-        const avatarUrls = avatarsRes.data.map(avatarFileName => 
-          `${API_BASE_URL}/avatares/${avatarFileName}`
-        );
-        setAvailableAvatars(avatarUrls);
+      const avatarUrls = avatarsRes.data.map(avatarFileName => 
+        `${SERVER_BASE_URL}/avatares/${avatarFileName}`
+      );
+      
+      setAvailableAvatars(avatarUrls);
 
-      } catch (error) {
-        console.error('Error al cargar datos:', error);
-        showSnackbar('Error al cargar el perfil o los avatares', 'error');
-      }
-    };
+    } catch (error) {
+      console.error('Error al cargar datos:', error);
+      showSnackbar('Error al cargar el perfil o los avatares', 'error');
+    }
+  };
 
-    fetchProfileAndAvatars();
-  }, []);
+  fetchProfileAndAvatars();
+}, []);
 
   const handleChange = (e) => {
     setProfile(prev => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  // Esta función ahora selecciona el avatar Y cierra el pop-up
   const handleAvatarSelect = (avatarUrl) => {
     setProfile(prev => ({ ...prev, avatar: avatarUrl }));
-    setIsModalOpen(false); // Cierra el modal después de seleccionar
+    setIsModalOpen(false);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const idUsuario = localStorage.getItem('idUsuario');
+      const idUsuario = sessionStorage.getItem('idUsuario');
       
       const updateData = { ...profile };
       if (!updateData.password) {
         delete updateData.password;
       }
       
-      await axios.put(`${API_BASE_URL}/api/web/usuarios/${idUsuario}`, updateData);
+      await apiClient.put(`/web/usuarios/${idUsuario}`, updateData);
 
       showSnackbar('Perfil actualizado con éxito', 'success');
       setProfile(prev => ({ ...prev, password: '' }));
@@ -120,7 +125,7 @@ const Profile = () => {
         }}
       >
         {/* --- Encabezado --- */}
-        <Box sx={{ textAlign: 'center', mb: 4, position: 'relative', display: 'inline-block', left: '50%', transform: 'translateX(-50%)' }}>
+        <Box sx={{ textAlign: 'center', mb: 4}}>
           <Typography variant="h4" sx={{ fontWeight: 700 }}>
             Mi Perfil
           </Typography>
@@ -135,7 +140,7 @@ const Profile = () => {
 
         <Grid container spacing={{ xs: 3, md: 5 }}>
           {/* --- Columna Izquierda: Avatar --- */}
-          <Grid item xs={12} md={4} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+          <Grid xs={12} md={4} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
             <Box sx={{ position: 'relative' }}>
               <Avatar
                 src={profile.avatar}
@@ -149,7 +154,7 @@ const Profile = () => {
               />
               <IconButton
                 color="primary"
-                onClick={() => setIsModalOpen(true)} // Abre el pop-up
+                onClick={() => setIsModalOpen(true)}
                 sx={{
                   position: 'absolute',
                   bottom: 5,
@@ -169,23 +174,22 @@ const Profile = () => {
           </Grid>
           
           {/* --- Columna Derecha: Formulario --- */}
-          <Grid item xs={12} md={8}>
+          <Grid xs={12} md={8}>
             <form onSubmit={handleSubmit}>
               <Grid container spacing={2}>
-                 {/* Tus TextFields (sin cambios) */}
-                 <Grid item xs={12} sm={6}>
+                <Grid xs={12} sm={6}>
                   <TextField fullWidth label="Nombre" name="nombre" value={profile.nombre} onChange={handleChange} variant="outlined" size="small" />
                 </Grid>
-                <Grid item xs={12} sm={6}>
+                <Grid xs={12} sm={6}>
                   <TextField fullWidth label="Apellido" name="apellido" value={profile.apellido} onChange={handleChange} variant="outlined" size="small" />
                 </Grid>
-                <Grid item xs={12}>
+                <Grid xs={12}>
                   <TextField fullWidth label="Correo electrónico" name="email" type="email" value={profile.email} onChange={handleChange} variant="outlined" size="small" InputProps={{ endAdornment: <InputAdornment position="end"><EmailIcon fontSize="small" /></InputAdornment> }} />
                 </Grid>
-                <Grid item xs={12}>
+                <Grid xs={12}>
                   <TextField fullWidth label="Nueva Contraseña" name="password" type="password" helperText="Dejar en blanco para mantener la actual" value={profile.password} onChange={handleChange} variant="outlined" size="small" InputProps={{ endAdornment: <InputAdornment position="end"><LockIcon fontSize="small" /></InputAdornment> }} />
                 </Grid>
-                <Grid item xs={12}>
+                <Grid xs={12}>
                   <TextField fullWidth select label="Género" name="genero" value={profile.genero} onChange={handleChange} variant="outlined" size="small">
                     <MenuItem value="Masculino">Masculino</MenuItem>
                     <MenuItem value="Femenino">Femenino</MenuItem>
@@ -193,10 +197,10 @@ const Profile = () => {
                     <MenuItem value="Prefiero no decir">Prefiero no decir</MenuItem>
                   </TextField>
                 </Grid>
-                <Grid item xs={12}>
+                <Grid xs={12}>
                   <TextField fullWidth label="Descripción" name="descripcion" multiline rows={3} value={profile.descripcion} onChange={handleChange} variant="outlined" size="small" helperText="Cuéntanos algo sobre ti" />
                 </Grid>
-                <Grid item xs={12} sx={{ mt: 1 }}>
+                <Grid xs={12} sx={{ mt: 1 }}>
                   <Button type="submit" variant="contained" startIcon={<SaveIcon />} fullWidth size="large" sx={{ py: 1.5, fontWeight: 600 }}>
                     Guardar Cambios
                   </Button>
@@ -232,7 +236,7 @@ const Profile = () => {
         <DialogContent dividers>
           <Grid container spacing={2} sx={{ p: 1 }}>
             {availableAvatars.map((url) => (
-              <Grid item key={url} xs={4} sm={3}>
+              <Grid key={url} xs={4} sm={3}>
                 <Avatar
                   src={url}
                   onClick={() => handleAvatarSelect(url)}
@@ -255,4 +259,4 @@ const Profile = () => {
   );
 };
 
-export default Profile;
+export default ProfileEditor;

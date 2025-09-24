@@ -1,10 +1,7 @@
 import { useState } from 'react';
 import {Box, TextField, Button, Typography, Container, Paper, MenuItem} from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import '../styles/register.css'
-
-
-
+import '../../../styles/register.css';
 
 const Register = () => {
   const API_URL = process.env.REACT_APP_API_URL;

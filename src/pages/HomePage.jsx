@@ -1,22 +1,15 @@
-import { useNavigate } from 'react-router-dom';
-import muñequito from '../assets/muñequito.png';
-import '../styles/home.css'
+// src/pages/HomePage.jsx
 
-export default function Home() {
+import { useNavigate } from 'react-router-dom';
+import muñequito from '../assets/muñequito.png'; // Asegúrate que la ruta a los assets sea correcta
+import '../styles/home.css'; // Asegúrate que la ruta a los styles sea correcta
+
+export default function HomePage() {
   const navigate = useNavigate();
 
   return (
     <div className="home-container">
-      {/* Formas decorativas */}
-      <div className="decorative-shape shape-1"></div>
-      <div className="decorative-shape shape-2"></div>
-      <div className="decorative-shape shape-3"></div>
-      <div className="decorative-shape shape-4"></div>
-
-      {/* Círculo con efecto de pulso */}
-      <div className="pulse-circle"></div>
-
-      {/* Contenido lado izquierdo */}
+      {/* ... (el resto del código JSX es idéntico) ... */}
       <div className="left-content">
         <h1 className="main-title">Take a Break</h1>
         <p className="subtitle">
@@ -29,11 +22,8 @@ export default function Home() {
           className="character-image"
         />
       </div>
-
-      {/* Contenido lado derecho */}
       <div className="right-content">
         <h2 className="right-title">Comienza aquí</h2>
-
         <div className="buttons-container">
           <button className="login-button" onClick={() => navigate('/login')}>
             Iniciar sesión
@@ -42,11 +32,10 @@ export default function Home() {
             Registrarse
           </button>
         </div>
-
-        {/* Pie de página */}
         <div className="footer">
-          {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
-          <a href="#" className="footer-link">Términos de uso</a>
+          <button type="button" className="footer-link" onClick={() => {/* TODO: handle terms of use click */}}>
+            Términos de uso
+          </button>
         </div>
       </div>
     </div>

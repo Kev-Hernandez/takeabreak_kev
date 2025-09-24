@@ -2,7 +2,7 @@ import React from 'react';
 import { Box, Typography, List, ListItem, ListItemText } from '@mui/material';
 import HistoryIcon from '@mui/icons-material/History';
 
-const Historial = ({ messages }) => {
+const ChatHistory = ({ messages }) => {
   const groupMessagesByDate = () => {
     const grouped = {};
     messages.forEach(msg => {
@@ -45,4 +45,4 @@ const Historial = ({ messages }) => {
   );
 };
 
-export default Historial;
+export default ChatHistory;

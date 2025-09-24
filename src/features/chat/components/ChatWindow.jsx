@@ -9,12 +9,12 @@ import {
   Delete as DeleteIcon,
   PeopleOutline as PeopleOutlineIcon
 } from '@mui/icons-material';
-import Historial from './Historial';
+import Historial from './ChatHistory';
 import axios from 'axios';
 
 
 
-const Chat = ({ recipientUser }) => {
+const ChatWindow = ({ recipientUser }) => {
   const [userId, setUserId] = useState('');
   const [userName, setUserName] = useState('');
   const [recipientId, setRecipientId] = useState(null);
@@ -441,4 +441,4 @@ return (
 );
 };
 
-export default Chat;
+export default ChatWindow;
