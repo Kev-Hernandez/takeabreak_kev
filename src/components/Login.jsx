@@ -1,23 +1,20 @@
 import { useState } from 'react';
-import {
-  Box,
-  TextField,
-  Button,
-  Typography,
-  Container,
-  Paper,
-} from '@mui/material';
+import {Box,TextField,Button,Typography,Container,Paper} from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import monitorange from '../assets/monitorange.png';
 import '../styles/login.css';
 
 const Login = () => {
   const navigate = useNavigate();
+  const API_URL = process.env.REACT_APP_API_URL;
+
 
   const [formData, setFormData] = useState({
-    correo: '',
-    contraseña: '',
+    email: '',
+    password: '',
   });
+  console.log('formData:', formData);
+
 
   const [errors, setErrors] = useState({});
 
@@ -25,23 +22,24 @@ const Login = () => {
     e.preventDefault();
 
     try {
-      const response = await fetch('http://localhost:3001/api/web/auth/login', {
+      const response = await fetch(`${API_URL}/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          email: formData.correo,
-          password: formData.contraseña,
+          email: formData.email,
+          password: formData.password,
         }),
       });
 
       if (response.ok) {
         const data = await response.json();
         // Guardar datos del usuario si es necesario
-        localStorage.setItem('user', JSON.stringify(data.usuario));
-        localStorage.setItem('idUsuario', data.usuario._id || data.usuario.id);
-        console.log('Usuario recibido del backend:', data.usuario);
+        sessionStorage.setItem('user', JSON.stringify(data.usuario));
+        sessionStorage.setItem('idUsuario', data.usuario._id || data.usuario.id);
+        sessionStorage.setItem('token', data.token);
+        console.log('Usuario recibido del backend:', data.usuario, data.token);
         navigate('/users'); // Cambiado de '/chat' a '/users'
       } else {
         const data = await response.json();
@@ -96,11 +94,11 @@ const Login = () => {
               margin="normal"
               required
               fullWidth
-              id="correo"
+              id="email"
               label="Correo Electrónico"
-              name="correo"
+              name="email"
               autoComplete="email"
-              value={formData.correo}
+              value={formData.email}
               onChange={handleChange}
             />
 
@@ -109,11 +107,11 @@ const Login = () => {
               margin="normal"
               required
               fullWidth
-              name="contraseña"
+              name="password"
               label="Contraseña"
               type="password"
-              id="contraseña"
-              value={formData.contraseña}
+              id="password"
+              value={formData.password}
               onChange={handleChange}
             />
 
