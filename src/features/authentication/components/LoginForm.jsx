@@ -19,7 +19,7 @@ const LoginForm = () => {
     e.preventDefault();
       setErrors({}); // Limpiar errores previos
     try {
-      const response = await apiClient.post('/api/login', formData);
+      const response = await apiClient.post('/api/v1/auth/login', formData);
       const data = response.data;
         sessionStorage.setItem('user', JSON.stringify(data.usuario));
         sessionStorage.setItem('idUsuario', data.usuario._id || data.usuario.id);

@@ -69,9 +69,8 @@ const Register = () => {
           plataforma: []
         };
         
-        await apiClient.post('/api/register', dataToSend);
-          navigate('/');
-          window.location.reload(); // Recargar para actualizar el estado de autenticación
+        await apiClient.post('/api/v1/auth/register', dataToSend);
+          navigate('/login?registered=true');
       } catch (error) {
         if (error.response){
           setErrors({ submit: error.response.data.mensaje || 'Error en el registro' });
