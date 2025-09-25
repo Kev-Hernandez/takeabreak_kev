@@ -39,8 +39,8 @@ useEffect(() => {
       if (!idUsuario) throw new Error('No se encontró el ID del usuario');
 
       const [profileRes, avatarsRes] = await Promise.all([
-        apiClient.get(`/api/user/getprofile/${idUsuario}`),
-        apiClient.get(`/api/web/avatars`),
+        apiClient.get(`/api/v1/users/${idUsuario}`),
+        apiClient.get(`/api/v1/users/utils/avatars`),
       ]);
       
       const profileData = profileRes.data;
@@ -54,7 +54,7 @@ useEffect(() => {
       
       const  baseUrl = apiClient.defaults.baseURL;
       const avatarUrl = avatarsRes.data.map(avatarFileName => 
-        `${baseUrl}api/avatares/${avatarFileName}`
+        `${baseUrl}public/avatares/${avatarFileName}`
       );
 
       setAvailableAvatars(avatarUrl);
@@ -88,7 +88,7 @@ useEffect(() => {
         delete updateData.password;
       }
       
-      await apiClient.put(`api/user/updateprofile/${idUsuario}`, updateData);
+      await apiClient.put(`/api/v1/users/${idUsuario}`, updateData);
 
       showSnackbar('Perfil actualizado con éxito', 'success');
       setProfile(prev => ({ ...prev, password: '' }));
@@ -102,7 +102,8 @@ useEffect(() => {
   const showSnackbar = (message, severity) => {
     setSnackbar({ open: true, message, severity });
   };
-  const fullavatarUrl = profile.avatar ? `${apiClient.defaults.baseURL}api/avatares/${profile.avatar}` : '';
+  const fullavatarUrl = profile.avatar ? `${apiClient.defaults.baseURL}public/avatares/${profile.avatar}` : '';
+  console.log('Avatar URL:', fullavatarUrl);
   return (
     <Box sx={{
       display: 'flex',
