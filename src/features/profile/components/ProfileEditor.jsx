@@ -5,8 +5,6 @@ import EmailIcon from '@mui/icons-material/Email';
 import LockIcon from '@mui/icons-material/Lock';
 import EditIcon from '@mui/icons-material/Edit';
 import CloseIcon from '@mui/icons-material/Close';
-
-// 1. Importamos nuestro 'apiClient' en lugar de 'axios'
 import apiClient from '../../../api/apiClient';
 
 // Animación para el diálogo modal
@@ -41,8 +39,8 @@ useEffect(() => {
       if (!idUsuario) throw new Error('No se encontró el ID del usuario');
 
       const [profileRes, avatarsRes] = await Promise.all([
-        apiClient.get(`/web/usuarios/${idUsuario}`),
-        apiClient.get(`/web/avatars`),
+        apiClient.get(`/api/user/getprofile/${idUsuario}`),
+        apiClient.get(`/api/web/avatars`),
       ]);
       
       const profileData = profileRes.data;
@@ -54,16 +52,12 @@ useEffect(() => {
         avatar: profileData.avatar || '',
       }));
       
-      // ======================= INICIO DE LA CORRECCIÓN FINAL =======================
-      // Esta línea es el problema. La reemplazamos por una que no incluya '/api'.
-      const SERVER_BASE_URL = 'http://localhost:3001'; 
-      // ======================= FIN DE LA CORRECCIÓN FINAL =======================
-
-      const avatarUrls = avatarsRes.data.map(avatarFileName => 
-        `${SERVER_BASE_URL}/avatares/${avatarFileName}`
+      const  baseUrl = apiClient.defaults.baseURL;
+      const avatarUrl = avatarsRes.data.map(avatarFileName => 
+        `${baseUrl}api/avatares/${avatarFileName}`
       );
-      
-      setAvailableAvatars(avatarUrls);
+
+      setAvailableAvatars(avatarUrl);
 
     } catch (error) {
       console.error('Error al cargar datos:', error);
@@ -79,7 +73,8 @@ useEffect(() => {
   };
 
   const handleAvatarSelect = (avatarUrl) => {
-    setProfile(prev => ({ ...prev, avatar: avatarUrl }));
+    const avatarFileName = avatarUrl.split('/').pop();
+    setProfile(prev => ({ ...prev, avatar: avatarFileName }));
     setIsModalOpen(false);
   };
 
@@ -93,7 +88,7 @@ useEffect(() => {
         delete updateData.password;
       }
       
-      await apiClient.put(`/web/usuarios/${idUsuario}`, updateData);
+      await apiClient.put(`api/user/updateprofile/${idUsuario}`, updateData);
 
       showSnackbar('Perfil actualizado con éxito', 'success');
       setProfile(prev => ({ ...prev, password: '' }));
@@ -107,7 +102,7 @@ useEffect(() => {
   const showSnackbar = (message, severity) => {
     setSnackbar({ open: true, message, severity });
   };
-
+  const fullavatarUrl = profile.avatar ? `${apiClient.defaults.baseURL}api/avatares/${profile.avatar}` : '';
   return (
     <Box sx={{
       display: 'flex',
@@ -143,7 +138,7 @@ useEffect(() => {
           <Grid xs={12} md={4} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
             <Box sx={{ position: 'relative' }}>
               <Avatar
-                src={profile.avatar}
+                src={fullavatarUrl}
                 alt={`${profile.nombre} ${profile.apellido}`}
                 sx={{
                   width: { xs: 120, md: 150 },

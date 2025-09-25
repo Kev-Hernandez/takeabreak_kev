@@ -2,9 +2,9 @@ import { useState } from 'react';
 import {Box, TextField, Button, Typography, Container, Paper, MenuItem} from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import '../../../styles/register.css';
+import apiClient from '../../../api/apiClient';
 
 const Register = () => {
-  const API_URL = process.env.REACT_APP_API_URL;
   
   const navigate = useNavigate();
 
@@ -50,6 +50,8 @@ const Register = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setErrors({});
+
 
     if (validateForm()) {
       try {
@@ -66,26 +68,19 @@ const Register = () => {
           },
           plataforma: []
         };
-
-        console.log("Datos enviados:", dataToSend);
-
-        const response = await fetch(`${API_URL}/register`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(dataToSend),
-        });
-
-        if (response.ok) {
+        
+        await apiClient.post('/api/register', dataToSend);
           navigate('/');
-        } else {
-          const data = await response.json();
-          console.log("Error del servidor:", data);
-          setErrors({ submit: data.mensaje || 'Error en el registro' });
-        }
+          window.location.reload(); // Recargar para actualizar el estado de autenticación
       } catch (error) {
-        console.error('Error:', error);
-        setErrors({ submit: 'Error de conexión con el servidor' });
+        if (error.response){
+          setErrors({ submit: error.response.data.mensaje || 'Error en el registro' });
+        } else {
+          setErrors({ submit: 'Error de conexión con el servidor' });
+        }
       }
+    }else{
+      return;
     }
   };
 

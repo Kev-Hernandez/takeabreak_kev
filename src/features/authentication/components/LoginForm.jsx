@@ -1,12 +1,11 @@
 // src/features/authentication/components/LoginForm.jsx
-
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Box, TextField, Button, Typography } from '@mui/material';
+import apiClient from '../../../api/apiClient';
 
 const LoginForm = () => {
   const navigate = useNavigate();
-  const API_URL = process.env.REACT_APP_API_URL;
 
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [errors, setErrors] = useState({});
@@ -18,25 +17,22 @@ const LoginForm = () => {
   
   const handleSubmit = async (e) => {
     e.preventDefault();
+      setErrors({}); // Limpiar errores previos
     try {
-      const response = await fetch(`${API_URL}/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
+      const response = await apiClient.post('/api/login', formData);
+      const data = response.data;
         sessionStorage.setItem('user', JSON.stringify(data.usuario));
         sessionStorage.setItem('idUsuario', data.usuario._id || data.usuario.id);
         sessionStorage.setItem('token', data.token);
         navigate('/dashboard'); // O a la nueva ruta del Dashboard
-      } else {
-        const data = await response.json();
-        setErrors({ submit: data.mensaje || 'Error en el inicio de sesión' });
+        window.location.reload(); // Recargar la página para actualizar el estado global
       }
-    } catch (error) {
-      setErrors({ submit: 'Error de conexión con el servidor' });
+    catch (error) {
+      if(error.response){
+        setErrors({ submit: error.response.data.mensaje || 'Error en el inicio de sesión' });
+      } else {
+        setErrors({ submit: 'Error de conexión con el servidor' });
+      }
     }
   };
 

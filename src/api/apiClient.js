@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // 1. Lees la variable de entorno UNA SOLA VEZ aquí.
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001'; // Añadimos un valor por defecto
+const API_URL = process.env.REACT_APP_API_URL ; // Añadimos un valor por defecto
 
 // 2. Creas una instancia de Axios con la URL base de tu API.
 const apiClient = axios.create({
@@ -30,10 +30,5 @@ apiClient.interceptors.request.use(
     return Promise.reject(error);
   }
 );
-
-
-// 4. Ahora, en lugar de importar axios en otros archivos, importas 'apiClient'.
-// Ejemplo: apiClient.post('/login', { email, password });
-// Ejemplo: apiClient.get('/api/web/avatars'); // -> Esta petición ya llevará el token automáticamente
 
 export default apiClient;
