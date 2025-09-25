@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Box, Dialog, Drawer } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import apiClient from '../api/apiClient'; // <-- Importa apiClient
 
 // Importaciones de componentes de features y layout
 import ProfileEditor from '../features/profile/components/ProfileEditor';
@@ -29,9 +30,8 @@ const DashboardPage = () => {
 
     const fetchActiveUsers = async () => {
       try {
-        const response = await fetch('http://localhost:3001/api/web/usuarios/activos');
-        if (!response.ok) throw new Error('Error al obtener usuarios');
-        const data = await response.json();
+        const response = await apiClient.get('/api/v1/users');
+        const data = response.data;
         setUsers(data);
         setFilteredUsers(data);
       } catch (error) {

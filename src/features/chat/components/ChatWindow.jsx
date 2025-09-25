@@ -10,8 +10,7 @@ import {
   PeopleOutline as PeopleOutlineIcon
 } from '@mui/icons-material';
 import Historial from './ChatHistory';
-import axios from 'axios';
-
+import apiClient from '../../../api/apiClient';
 
 
 const ChatWindow = ({ recipientUser }) => {
@@ -50,9 +49,8 @@ const ChatWindow = ({ recipientUser }) => {
 
       try {
         console.log('Fetching chat history for', userId, recipientId);
-        const response = await fetch(`http://localhost:3001/api/web/chat/history/${userId}/${recipientId}`);
-        if (!response.ok) throw new Error('Error al obtener historial');
-        const data = await response.json();
+        const response = await apiClient.get(`/api/v1/chat/history/${userId}/${recipientId}`);
+        const data = response.data;
         const formattedMessages = data.mensajes.map(msg => ({
           remitenteId: msg.remitenteId,
           remitenteNombre: msg.remitenteNombre || '',
@@ -148,11 +146,9 @@ const handleClearHistory = async () => {
   if (!userId || !recipientId) return;
 
   try {
-    await axios.delete(`http://localhost:3001/api/web/chat/history/${userId}/${recipientId}`);
-    // Recarga mensajes del chat (vacío)
-    const response = await fetch(`http://localhost:3001/api/web/chat/history/${userId}/${recipientId}`);
-    if (!response.ok) throw new Error('Error al obtener historial tras borrar');
-    const data = await response.json();
+    await apiClient.delete(`/api/v1/chat/history/${userId}/${recipientId}`);
+    const response = await apiClient.get(`/api/v1/chat/history/${userId}/${recipientId}`);
+    const data = response.data;
     setMessages(data.mensajes.map(msg => ({
       remitenteId: msg.remitenteId,
       remitenteNombre: msg.remitenteNombre || '',
