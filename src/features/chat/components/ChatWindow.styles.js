@@ -3,13 +3,14 @@ import { Box, Paper, Typography, IconButton, TextField, Button, List } from '@mu
 
 // --- Contenedores Principales ---
 
-export const ChatContainer = styled(Box)({
+export const ChatContainer = styled(Box)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'column',
   height: '100vh',
-  backgroundColor: '#0D1B2A', // Fondo principal oscuro
+  backgroundColor: theme.palette.background.default,
+  borderRadius: '28px',
   flex: 2,
-});
+}));
 
 export const Header = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(2),
@@ -17,17 +18,17 @@ export const Header = styled(Paper)(({ theme }) => ({
   justifyContent: 'space-between',
   alignItems: 'center',
   borderRadius: 0,
-  backgroundColor: '#1B263B', // Fondo secundario
-  color: '#E0E1DD', // Texto principal
+  backgroundColor: theme.palette.background.paper,
+  color: theme.palette.text.primary,
   boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)',
   borderBottom: `1px solid ${theme.palette.divider}`,
 }));
 
 export const HistoryButton = styled(Button)(({ theme }) => ({
   backgroundColor: 'rgba(255, 255, 255, 0.1)',
-  color: '#E0E1DD',
+  color: theme.palette.text.primary,
   '&:hover': {
-    backgroundColor: 'rgba(0, 245, 212, 0.2)', // Brillo de acento
+    backgroundColor: `rgba(${theme.palette.primary.mainChannel} / 0.2)`,
     color: '#00F5D4',
   },
 }));
@@ -50,14 +51,13 @@ export const MessageBubble = styled(Paper)(({ theme, owner }) => ({
   borderRadius: '16px',
   maxWidth: '75%',
   wordWrap: 'break-word',
-  // Lógica condicional para el estilo basado en el dueño del mensaje
   ...(owner === 'user' ? {
-    backgroundColor: '#00F5D4', // Acento primario para el usuario
-    color: '#0D1B2A', // Texto oscuro para contraste
+    backgroundColor: theme.palette.primary.main, // <-- CORREGIDO
+    color: theme.palette.primary.contrastText, // <-- CORREGIDO
     borderBottomRightRadius: '4px',
   } : {
-    backgroundColor: '#1B263B', // Fondo secundario para el otro
-    color: '#E0E1DD', // Texto principal
+    backgroundColor: theme.palette.background.paper, // <-- CORREGIDO
+    color: theme.palette.text.primary, // <-- CORREGIDO
     borderBottomLeftRadius: '4px',
   })
 }));

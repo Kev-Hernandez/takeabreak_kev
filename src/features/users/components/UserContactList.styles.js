@@ -68,7 +68,7 @@ export const ContactList = styled(Box)({
   },
 });
 
-export const ContactItem = styled(Box)(({ theme, isSelected }) => ({
+export const ContactItem = styled(Box, {shouldForwardProp: (prop) => prop !== 'isSelected',})(({ theme, isSelected }) => ({
   display: 'flex',
   alignItems: 'center',
   gap: theme.spacing(2),

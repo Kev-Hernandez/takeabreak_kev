@@ -1,13 +1,18 @@
+// fileName: src/features/chat/components/UsersOn.jsx (VERSIÓN FINAL)
+
 import React from 'react';
 import { Box, List, ListItem, ListItemText, Typography, ListItemButton } from '@mui/material';
 import { useChatContext } from '../../../context/ChatContext';
+import { useThemeContext } from '../../../context/ThemeContext'; // <-- 1. Importa el contexto del tema
 
 const UsersOn = ({ onUserSelected }) => {
   const { users, currentUserId, handleSelectUser } = useChatContext();
+  const { setThemeMode } = useThemeContext(); // <-- 2. Obtiene la función para cambiar el tema
 
   const handleUserClick = (user) => {
     handleSelectUser(user);
-    if (onUserSelected) onUserSelected(); // Cierra el drawer al seleccionar
+    setThemeMode('neutral'); // <-- 3. Resetea el tema
+    if (onUserSelected) onUserSelected(); 
   }
 
   return (
@@ -15,14 +20,14 @@ const UsersOn = ({ onUserSelected }) => {
       <Typography variant="h6" gutterBottom>Usuarios activos</Typography>
       {users.length > 0 ? (
         <List>
-          {users.map((user, index) => (
+          {users.map((user) => (
             <ListItem 
-              key={user._id || index} 
+              key={user._id} 
               disablePadding
               sx={{ opacity: user._id === currentUserId ? 0.5 : 1 }}
             >
               <ListItemButton
-                onClick={() => handleUserClick(user)}
+                onClick={() => handleUserClick(user)} // <-- 4. Llama a la nueva función
                 disabled={user._id === currentUserId}
               >
                 <ListItemText 
