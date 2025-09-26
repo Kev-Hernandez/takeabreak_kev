@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import {Box, TextField, Button, Typography, Container, Paper, MenuItem} from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import '../../../styles/register.css';
+import './register.css';
 import apiClient from '../../../api/apiClient';
 
 const Register = () => {

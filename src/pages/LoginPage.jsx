@@ -2,8 +2,8 @@
 
 import { Box, Typography, Container, Paper } from '@mui/material';
 import monitorange from '../assets/monitorange.png';
-import '../styles/login.css';
-import LoginForm from '../features/authentication/components/LoginForm'; // <-- IMPORTANTE
+import LoginForm from '../features/authentication/components/LoginForm';
+import './../features/authentication/components/login.css';
 
 const LoginPage = () => {
   return (

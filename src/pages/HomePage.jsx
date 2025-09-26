@@ -2,7 +2,7 @@
 
 import { useNavigate } from 'react-router-dom';
 import muñequito from '../assets/muñequito.png'; // Asegúrate que la ruta a los assets sea correcta
-import '../styles/home.css'; // Asegúrate que la ruta a los styles sea correcta
+import './home.css';
 
 export default function HomePage() {
   const navigate = useNavigate();

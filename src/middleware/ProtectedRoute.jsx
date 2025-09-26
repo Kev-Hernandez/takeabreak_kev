@@ -1,18 +1,22 @@
-import React from 'react';
-import { Navigate, Outlet } from 'react-router-dom';
+// fileName: src/middleware/ProtectedRoute.jsx (VERSIÓN CORREGIDA)
 
-const ProtectedRoute = () => {
-  // 1. Revisa si el token existe en el almacenamiento local
+import React from 'react';
+import { Navigate } from 'react-router-dom';
+
+// 1. Aceptamos 'children' como una prop.
+// 'children' será el componente que envolvamos (en este caso, <DashboardLayout />)
+const ProtectedRoute = ({ children }) => {
+  console.log('2. Renderizando ProtectedRoute'); // Puedes dejar este log para confirmar
+  
   const token = sessionStorage.getItem('token');
 
-  // 2. Si NO hay token, redirige al usuario a la página de login
   if (!token) {
-    return <Navigate to="/login" />;
+    // Si no hay token, redirige al login.
+    return <Navigate to="/login" replace />;
   }
 
-  // 3. Si SÍ hay token, permite que se muestre la página solicitada
-  // El componente <Outlet /> renderiza el componente hijo (ej. <Dashboard />)
-  return <Outlet />;
+  // 3. Si hay token, simplemente renderiza el componente hijo.
+  return children;
 };
 
 export default ProtectedRoute;

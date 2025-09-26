@@ -1,31 +1,34 @@
-// src/App.jsx
+// fileName: src/App.jsx (VERSIÓN CORREGIDA)
+import { Routes, Route } from 'react-router-dom'; // <-- Ya no importas BrowserRouter/Router
+import ProtectedRoute from './middleware/ProtectedRoute';
 
-import { Routes, Route } from 'react-router-dom';
-
-// 1. Importaciones actualizadas a los nuevos componentes de página
+// Pages
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
-import DashboardPage from './pages/DashboardPage';
-import ProtectedRoute from './middleware/ProtectedRoute';
 
+// Layouts
+import DashboardLayout from './layouts/DashboardLayout';
 
 function App() {
+  console.log('1. renederizando app')
+  // Eliminamos <Router> de aquí
   return (
     <Routes>
-      {/* --- Rutas Públicas --- */}
+      {/* Rutas Públicas */}
       <Route path="/" element={<HomePage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
 
-      {/* --- Rutas Protegidas --- */}
-      <Route element={<ProtectedRoute />}>
-        {/* La única ruta protegida ahora es el Dashboard, que contiene todo lo demás */}
-        <Route path="/dashboard" element={<DashboardPage />} />
-      </Route>
-      
-      {/* Puedes agregar una ruta para páginas no encontradas si lo deseas */}
-      {/* <Route path="*" element={<NotFoundPage />} /> */}
+      {/* Rutas Protegidas */}
+      <Route 
+        path="/dashboard" 
+        element={
+          <ProtectedRoute>
+            <DashboardLayout />
+          </ProtectedRoute>
+        } 
+      />
     </Routes>
   );
 }

@@ -1,20 +1,14 @@
 import React from 'react';
-import { 
-  Box, 
-  List, 
-  ListItem, 
-  ListItemText, 
-  Typography,
-  ListItemButton 
-} from '@mui/material';
+import { Box, List, ListItem, ListItemText, Typography, ListItemButton } from '@mui/material';
+import { useChatContext } from '../../../context/ChatContext';
 
-const UsersOn = ({ users, onSelectUser, currentUserId }) => {
-  const handleUserSelect = (selectedUser) => {
-    // No permitir seleccionarse a sí mismo
-    if (selectedUser._id !== currentUserId) {
-      onSelectUser(selectedUser);
-    }
-  };
+const UsersOn = ({ onUserSelected }) => {
+  const { users, currentUserId, handleSelectUser } = useChatContext();
+
+  const handleUserClick = (user) => {
+    handleSelectUser(user);
+    if (onUserSelected) onUserSelected(); // Cierra el drawer al seleccionar
+  }
 
   return (
     <Box sx={{ p: 2, width: 300 }}>
@@ -25,17 +19,14 @@ const UsersOn = ({ users, onSelectUser, currentUserId }) => {
             <ListItem 
               key={user._id || index} 
               disablePadding
-              sx={{
-                opacity: user._id === currentUserId ? 0.5 : 1,
-                cursor: user._id === currentUserId ? 'default' : 'pointer'
-              }}
+              sx={{ opacity: user._id === currentUserId ? 0.5 : 1 }}
             >
               <ListItemButton
-                onClick={() => handleUserSelect(user)}
+                onClick={() => handleUserClick(user)}
                 disabled={user._id === currentUserId}
               >
                 <ListItemText 
-                  primary={user.nombre || user.email || `Usuario ${index + 1}`}
+                  primary={`${user.nombre} ${user.apellido}`}
                   secondary={user._id === currentUserId ? '(Tú)' : ''}
                 />
               </ListItemButton>

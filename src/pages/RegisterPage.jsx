@@ -1,7 +1,7 @@
 // src/pages/RegisterPage.jsx
 
 import { Box, Typography, Container, Paper } from '@mui/material';
-import '../styles/register.css';
+import './../features/authentication/components/register.css';
 import RegisterForm from '../features/authentication/components/RegisterForm'; // <-- IMPORTANTE
 
 const RegisterPage = () => {

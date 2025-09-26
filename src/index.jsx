@@ -7,7 +7,7 @@ import App from './App.jsx';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <BrowserRouter basename="/takeabreak_kev"> {/* 👉 Envuelve App con esto */}
+    <BrowserRouter basename={process.env.PUBLIC_URL}> {/* 👉 Envuelve App con esto */}
       <App />
     </BrowserRouter>
   </StrictMode>
