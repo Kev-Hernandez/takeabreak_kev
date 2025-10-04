@@ -1,8 +1,8 @@
 // fileName: src/hooks/useChat.js (VERSIÓN EDITADA)
 
 import { useState, useEffect, useCallback } from 'react';
-import apiClient from '../api/apiClient';
-import { useThemeContext } from '../context/ThemeContext'; // <-- 1. Importamos el contexto del tema
+import apiClient from '../../../api/apiClient';
+import { useThemeContext } from '../../../context/ThemeContext'; // <-- 1. Importamos el contexto del tema
 
 export const useChat = (userId, recipientUser) => {
   const { setThemeMode } = useThemeContext(); // <-- 2. Obtenemos la función para cambiar el tema

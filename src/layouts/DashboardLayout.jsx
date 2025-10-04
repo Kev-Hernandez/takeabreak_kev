@@ -1,42 +1,54 @@
-import { useState } from 'react';
+// fileName: src/layouts/DashboardLayout.jsx (VERSIÓN MODULARIZADA)
+
 import { Box, Dialog, Drawer } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
 import { ChatProvider } from '../context/ChatContext';
+import { DashboardProvider, useDashboardContext } from '../context/DashboardContext';
+
 import ProfileEditor from '../features/profile/components/ProfileEditor';
 import ChatWindow from '../features/chat/components/ChatWindow';
 import UsersOn from '../features/chat/components/UsersOn';
 import UserContactList from '../features/users/components/UserContactList';
 import Sidebar from './SideBar';
+import OnboardingDialog from '../features/onboarding/components/OnboardingDialog';
 
-const DashboardLayout = () => {
-  const [openProfile, setOpenProfile] = useState(false);
-  const [drawerOpen, setDrawerOpen] = useState(false);
-  const navigate = useNavigate();
-
-  const handleLogout = () => {
-    sessionStorage.clear();
-    navigate('/login');
-  }
+// Componente interno que renderiza la UI y tiene acceso a ambos contextos
+const DashboardUI = () => {
+  const { 
+    isProfileOpen, closeProfile, 
+    isUsersDrawerOpen, closeUsersDrawer, 
+    isOnboardingOpen, handleOnboardingComplete 
+  } = useDashboardContext();
 
   return (
-    <ChatProvider>
-      <Box sx={{ display: 'flex', height: '100vh', overflow: 'hidden' }}>
-        
-        <Sidebar 
-          onOpenProfile={() => setOpenProfile(true)} 
-          onOpenActiveUsers={() => setDrawerOpen(true)}
-          onLogout={handleLogout}
-        />
-        <UserContactList />
+    <Box sx={{ display: 'flex', height: '100vh', overflow: 'hidden' }}>
+      <Sidebar />
+      <UserContactList />
+      <Box sx={{ flex: 2, display: 'flex' }}>
         <ChatWindow />
-        <Dialog open={openProfile} onClose={() => setOpenProfile(false)}>
-          <ProfileEditor />
-        </Dialog>
-        <Drawer anchor="right" open={drawerOpen} onClose={() => setDrawerOpen(false)}>
-          {/* Le pasamos una función para que se pueda cerrar desde adentro */}
-          <UsersOn onUserSelected={() => setDrawerOpen(false)} /> 
-        </Drawer>
       </Box>
+
+      {/* MODALES Y DRAWERS */}
+      <Dialog open={isProfileOpen} onClose={closeProfile} maxWidth="md">
+        <ProfileEditor />
+      </Dialog>
+      <Drawer anchor="right" open={isUsersDrawerOpen} onClose={closeUsersDrawer}>
+        <UsersOn onUserSelected={closeUsersDrawer} />
+      </Drawer>
+      <OnboardingDialog 
+        open={isOnboardingOpen} 
+        onClose={handleOnboardingComplete} 
+      />
+    </Box>
+  );
+};
+
+// El layout principal ahora solo se encarga de proveer los contextos
+const DashboardLayout = () => {
+  return (
+    <ChatProvider>
+      <DashboardProvider>
+        <DashboardUI />
+      </DashboardProvider>
     </ChatProvider>
   );
 };

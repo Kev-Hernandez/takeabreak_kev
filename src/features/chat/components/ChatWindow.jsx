@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { Typography, Drawer, Tooltip, Avatar, ListItem, Box, Button } from '@mui/material';
 import { Delete as DeleteIcon, PeopleOutline as PeopleOutlineIcon, Send as SendIcon } from '@mui/icons-material';
 import Historial from './ChatHistory';
-import { useChat } from '../../../hooks/useChat';
+import { useChat } from '../hooks/useChat';
 import { useChatContext } from '../../../context/ChatContext';
 
 // 1. Importamos nuestros nuevos componentes estilizados

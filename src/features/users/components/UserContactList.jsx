@@ -5,6 +5,9 @@ import { InputAdornment, Badge, Typography } from '@mui/material';
 import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 import SearchIcon from '@mui/icons-material/Search';
 import apiClient from '../../../api/apiClient';
+import IconButton from '@mui/material/IconButton';
+import AddIcon from '@mui/icons-material/Add';
+import { useNavigate } from 'react-router-dom';
 
 // 1. Importamos AMBOS hooks de contexto
 import { useChatContext } from '../../../context/ChatContext';
@@ -16,6 +19,7 @@ import {
 
 const UserContactList = () => {
   // 2. Usamos ambos contextos para obtener lo que necesitamos de cada uno
+  const navigate = useNavigate();
   const { users, selectedUser, handleSelectUser, handleSearchChange, currentUserId } = useChatContext();
   const { setThemeMode } = useThemeContext(); // <-- Obtenemos la función para cambiar el tema
   
@@ -37,6 +41,12 @@ const UserContactList = () => {
     <ListContainer>
       <Header variant="h6">
         <ChatBubbleOutlineIcon /> Chats
+        <div style={{ flexGrow: 1 }} /> {/* Espaciador */}
+        
+        {/* ✅ 3. Añade el botón que navegará a la nueva página */}
+        <IconButton title="Explorar usuarios" onClick={() => navigate('/explore')}>
+          <AddIcon sx={{ color: '#E0E1DD' }} />
+        </IconButton>
       </Header>
       
       <SearchTextField

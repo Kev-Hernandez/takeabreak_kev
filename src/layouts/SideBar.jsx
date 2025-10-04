@@ -1,5 +1,3 @@
-// fileName: src/layouts/SideBar.jsx (VERSIÓN FINAL CON SELECTOR DE TEMA)
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Box, Typography, Divider } from '@mui/material';
@@ -9,10 +7,13 @@ import HomeIcon from '@mui/icons-material/Home';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import GroupIcon from '@mui/icons-material/Group';
 import LogoutIcon from '@mui/icons-material/Logout';
+import PaletteIcon from '@mui/icons-material/Palette'; // Icono para el selector de temas
 
-// 1. Importamos el hook para acceder al contexto del tema
+// 1. Importamos AMBOS hooks de contexto
 import { useThemeContext } from '../context/ThemeContext';
+import { useDashboardContext } from '../context/DashboardContext';
 
+// Importamos los componentes estilizados
 import {
   SidebarContainer,
   MenuToggleButton,
@@ -22,17 +23,19 @@ import {
   Spacer
 } from './SideBar.styles';
 
-const Sidebar = ({ onOpenProfile, onOpenActiveUsers, onLogout }) => {
+const Sidebar = () => { // <-- Ya no necesita recibir props
   const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
   
-  // 2. Usamos el contexto para obtener el tema actual y la función para cambiarlo
+  // 2. Usamos los contextos para obtener todo lo que necesitamos
   const { themeMode, setThemeMode } = useThemeContext();
+  const { openProfile, toggleUsersDrawer, handleLogout } = useDashboardContext();
 
+  // 3. Las acciones de los menú items ahora usan las funciones del contexto
   const menuItems = [
     { icon: <HomeIcon />, text: 'Inicio', action: () => navigate('/') },
-    { icon: <AccountCircleIcon />, text: 'Perfil', action: onOpenProfile },
-    { icon: <GroupIcon />, text: 'Usuarios activos', action: onOpenActiveUsers }
+    { icon: <AccountCircleIcon />, text: 'Perfil', action: openProfile },
+    { icon: <GroupIcon />, text: 'Usuarios activos', action: toggleUsersDrawer }
   ];
 
   const themeOptions = [
@@ -55,31 +58,37 @@ const Sidebar = ({ onOpenProfile, onOpenActiveUsers, onLogout }) => {
         </MenuItem>
       ))}
 
-      {/* --- NUEVA SECCIÓN: SELECTOR DE TEMAS --- */}
+      {/* --- SECCIÓN SELECTOR DE TEMAS --- */}
       <Divider sx={{ my: 2, borderColor: 'rgba(255, 255, 255, 0.1)' }} />
-      {menuOpen && <Typography variant="caption" sx={{ color: '#A9A9A9', px: 2, mb: 1 }}>Temas de Chat</Typography>}
+      {menuOpen && (
+        <Typography variant="caption" sx={{ color: '#A9A9A9', px: 2, mb: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
+          <PaletteIcon sx={{ fontSize: '1rem' }} /> Temas
+        </Typography>
+      )}
       <Box sx={{ width: '100%'}}>
         {themeOptions.map((theme) => (
           <MenuItem
             key={theme.mode}
-            // 3. El onClick llama a setThemeMode con el nombre del tema
             onClick={() => setThemeMode(theme.mode)}
             open={menuOpen}
-            // Estilo para resaltar el tema activo
             sx={{
               backgroundColor: themeMode === theme.mode ? 'rgba(0, 245, 212, 0.2)' : 'transparent',
-              color: themeMode === theme.mode ? '#00F5D4' : '#A9A9A9'
+              color: themeMode === theme.mode ? '#00F5D4' : '#A9A9A9',
+              '&:hover': {
+                backgroundColor: themeMode === theme.mode ? 'rgba(0, 245, 212, 0.3)' : 'rgba(255, 255, 255, 0.05)',
+              }
             }}
           >
             {menuOpen && <MenuLabel variant="body2">{theme.name}</MenuLabel>}
           </MenuItem>
         ))}
       </Box>
-      {/* --- FIN DE LA NUEVA SECCIÓN --- */}
+      {/* --- FIN DE LA SECCIÓN --- */}
 
       <Spacer />
 
-      <LogoutButton startIcon={<LogoutIcon />} onClick={onLogout} open={menuOpen}>
+      {/* 4. El botón de logout ahora usa 'handleLogout' del contexto */}
+      <LogoutButton startIcon={<LogoutIcon />} onClick={handleLogout} open={menuOpen}>
         {menuOpen && <MenuLabel variant="body2">Cerrar Sesión</MenuLabel>}
       </LogoutButton>
     </SidebarContainer>
