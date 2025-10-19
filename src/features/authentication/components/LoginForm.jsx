@@ -1,12 +1,16 @@
-// src/features/authentication/components/LoginForm.jsx
+// src/features/authentication/components/LoginForm.jsx (EDITADO)
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Box, TextField, Button, Typography } from '@mui/material';
-import apiClient from '../../../api/apiClient';
+// ✅ 1. Importa el hook del AuthContext
+import { useAuthContext } from '../../../context/AuthContext';
+//import apiClient from '../../../api/apiClient'; // Se mantiene por si AuthContext no lo importa, aunque lo ideal es que AuthContext maneje apiClient
 import './login.css';
 
 const LoginForm = () => {
   const navigate = useNavigate();
+  // ✅ 2. Obtiene la función 'login' del contexto
+  const { login } = useAuthContext();
 
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [errors, setErrors] = useState({});
@@ -18,17 +22,18 @@ const LoginForm = () => {
   
   const handleSubmit = async (e) => {
     e.preventDefault();
-      setErrors({}); // Limpiar errores previos
+    setErrors({}); // Limpiar errores previos
     try {
-      const response = await apiClient.post('/api/v1/auth/login', formData);
-      const data = response.data;
-        sessionStorage.setItem('user', JSON.stringify(data.usuario));
-        sessionStorage.setItem('idUsuario', data.usuario._id || data.usuario.id);
-        sessionStorage.setItem('token', data.token);
-        navigate('/dashboard'); // O a la nueva ruta del Dashboard
-        window.location.reload(); // Recargar la página para actualizar el estado global
-      }
-    catch (error) {
+      // ✅ 3. Llama a la función 'login' del contexto.
+      // Esta función ahora se encarga de llamar a la API y guardar en sessionStorage.
+      await login(formData);
+      
+      // ✅ 4. Navega al dashboard.
+      navigate('/dashboard'); 
+      
+      // ❌ 5. Se elimina 'window.location.reload()'.
+      
+    } catch (error) {
       if(error.response){
         setErrors({ submit: error.response.data.mensaje || 'Error en el inicio de sesión' });
       } else {
@@ -80,7 +85,7 @@ const LoginForm = () => {
         className="login-link"
       >
         ¿Aún no te has registrado? Regístrate aquí
-      </Button>
+      </Button>    
     </>
   );
 };

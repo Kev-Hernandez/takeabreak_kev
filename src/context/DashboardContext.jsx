@@ -1,7 +1,5 @@
-// fileName: src/context/DashboardContext.jsx
-
 import React, { createContext, useState, useEffect, useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useAuthContext } from './AuthContext'; 
 
 const DashboardContext = createContext();
 
@@ -13,34 +11,37 @@ export const DashboardProvider = ({ children }) => {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isUsersDrawerOpen, setIsUsersDrawerOpen] = useState(false);
   const [isOnboardingOpen, setIsOnboardingOpen] = useState(false);
-  const navigate = useNavigate();
 
-  // Lógica para decidir si se muestra la encuesta de onboarding
+
+  const { user, isLoadingUser, logout, updateUser } = useAuthContext(); 
+
+ 
   useEffect(() => {
-    const currentUser = JSON.parse(sessionStorage.getItem('user'));
-    if (currentUser && !currentUser.hasCompletedOnboarding) {
-      setIsOnboardingOpen(true);
+    
+    if (!isLoadingUser && user) {
+      
+      if (user.hasCompletedOnboarding === false) {
+        setIsOnboardingOpen(true);
+      }
     }
-  }, []);
+  }, [user, isLoadingUser]); 
 
   const handleLogout = () => {
-    sessionStorage.clear();
-    navigate('/login');
+    logout(); 
   };
   
   const handleOnboardingComplete = () => {
     setIsOnboardingOpen(false);
-    const currentUser = JSON.parse(sessionStorage.getItem('user'));
-    const updatedUser = { ...currentUser, hasCompletedOnboarding: true };
-    sessionStorage.setItem('user', JSON.stringify(updatedUser));
+    
+    if (user) {
+      updateUser({ ...user, hasCompletedOnboarding: true });
+    }
   };
 
   const value = {
-    // Estados
     isProfileOpen,
     isUsersDrawerOpen,
     isOnboardingOpen,
-    // Funciones
     openProfile: () => setIsProfileOpen(true),
     closeProfile: () => setIsProfileOpen(false),
     toggleUsersDrawer: () => setIsUsersDrawerOpen(prev => !prev),
