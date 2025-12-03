@@ -37,8 +37,14 @@ export const useChat = (userId, recipientUser) => {
   // --- LÓGICA DE WEBSOCKET (con integración de tema) ---
   useEffect(() => {
     if (!userId || !recipientId) return;
-    const ws = new WebSocket('ws://localhost:3001');
+    // 1. OBTENER LA URL BASE DE LA API DESDE VARIABLES DE ENTORNO
+    const apiBaseUrl = process.env.REACT_APP_API_URL || 'http://localhost:3001';
 
+    // 2. CONVERTIR HTTP A WEBSOCKET (ws/wss)
+    const wsUrl = apiBaseUrl.replace(/^http/, 'ws');
+
+    console.log('Intentando conectar WS a:', wsUrl); // Para depurar
+    const ws = new WebSocket(wsUrl);
     ws.onopen = () => {
       console.log('✅ Conectado al WebSocket');
       ws.send(JSON.stringify({ type: 'init', userId }));
