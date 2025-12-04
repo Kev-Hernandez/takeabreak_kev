@@ -1,26 +1,25 @@
-// src/pages/HomePage.jsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Dialog, IconButton, Typography, Box, Button } from '@mui/material';
 import { Smartphone, Close, GetApp } from '@mui/icons-material';
 
-// Importamos tus recursos existentes
+// Importamos tus recursos
 import muñequito from '../assets/muñequito.png'; 
-import GlassCard from '../components/common/GlassCard'; // Reusamos tu componente maestro
+import GlassCard from '../components/common/GlassCard'; 
 import { APP_COLORS } from '../utils/constants';
 import './home.css';
 
-// URL temporal de un QR (Cámbiala por la imagen de tu QR real)
-const QR_IMAGE_URL = "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://takeabreak-app.com/download";
+// ✅ IMPORTAMOS TU CÓDIGO QR LOCAL
+import qrImage from '../assets/qr-apk.jpg'; 
 
 export default function HomePage() {
   const navigate = useNavigate();
-  const [openQr, setOpenQr] = useState(false); // Estado para el modal
+  const [openQr, setOpenQr] = useState(false); 
 
   return (
     <div className="home-container">
       
-      {/* Botón Flotante para la App Móvil (Arriba a la derecha o en el flujo) */}
+      {/* Botón Flotante App Móvil */}
       <Box sx={{ position: 'absolute', top: 20, right: 20, zIndex: 10 }}>
         <Button 
           startIcon={<Smartphone />} 
@@ -39,10 +38,8 @@ export default function HomePage() {
         </Button>
       </Box>
 
-      {/* Tarjeta Principal (Tu código original) */}
+      {/* Tarjeta Principal */}
       <div className="hero-card">
-        
-        {/* Lado Izquierdo */}
         <div className="left-content">
           <div className="title-wrapper">
             <h1 className="main-title">Take a Break</h1>
@@ -65,7 +62,6 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* Lado Derecho */}
         <div className="right-content">
            <img src={muñequito} alt="Mascota escuchando música" className="character-image"/>
         </div>
@@ -76,22 +72,16 @@ export default function HomePage() {
         © 2025 Take a Break
       </div>
 
-      {/* --- NUEVO: MODAL DEL CÓDIGO QR --- */}
+      {/* --- MODAL DEL CÓDIGO QR --- */}
       <Dialog 
         open={openQr} 
         onClose={() => setOpenQr(false)}
-        // Hacemos el fondo del modal transparente para usar GlassCard
         PaperProps={{ sx: { bgcolor: 'transparent', boxShadow: 'none', overflow: 'visible' } }}
       >
         <GlassCard sx={{ 
-          p: 4, 
-          alignItems: 'center', 
-          maxWidth: 350, 
-          textAlign: 'center',
-          border: '1px solid rgba(255,255,255,0.4)',
-          position: 'relative'
+          p: 4, alignItems: 'center', maxWidth: 350, textAlign: 'center',
+          border: '1px solid rgba(255,255,255,0.4)', position: 'relative'
         }}>
-          {/* Botón cerrar */}
           <IconButton 
             onClick={() => setOpenQr(false)}
             sx={{ position: 'absolute', top: 10, right: 10, color: 'white' }}
@@ -106,16 +96,14 @@ export default function HomePage() {
             Escanea el código para descargar la App en tu celular.
           </Typography>
 
-          {/* Contenedor del QR con borde brillante */}
+          {/* Contenedor del QR */}
           <Box sx={{ 
-            p: 2, 
-            bgcolor: 'white', 
-            borderRadius: '20px', 
-            boxShadow: '0 0 20px rgba(255,255,255,0.3)',
-            mb: 3
+            p: 2, bgcolor: 'white', borderRadius: '20px', 
+            boxShadow: '0 0 20px rgba(255,255,255,0.3)', mb: 3
           }}>
+            {/* ✅ USAMOS LA VARIABLE IMPORTADA */}
             <img 
-              src={QR_IMAGE_URL} 
+              src={qrImage} 
               alt="QR Code" 
               style={{ width: '100%', height: 'auto', display: 'block' }} 
             />
@@ -124,13 +112,10 @@ export default function HomePage() {
           <Button 
             variant="contained" 
             startIcon={<GetApp />}
-            href="#" // Aquí podrías poner el link directo al .apk si quieres
+            href="#" 
             sx={{ 
-              bgcolor: APP_COLORS.secondary, 
-              color: '#000', 
-              fontWeight: 'bold',
-              borderRadius: '50px',
-              width: '100%'
+              bgcolor: APP_COLORS.secondary, color: '#000', fontWeight: 'bold',
+              borderRadius: '50px', width: '100%'
             }}
           >
             Descarga Directa
@@ -138,7 +123,6 @@ export default function HomePage() {
 
         </GlassCard>
       </Dialog>
-
     </div>
   );
 }
