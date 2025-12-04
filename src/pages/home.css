@@ -1,29 +1,28 @@
 /* src/pages/home.css */
 
-/* Contenedor principal: centra la tarjeta en la pantalla */
 .home-container {
   min-height: 100vh;
   width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 20px; /* Margen para que no pegue a los bordes en celular */
+  padding: 20px; 
   box-sizing: border-box;
-  /* El fondo de colores viene del body en index.css */
+  
 }
 
-/* --- TARJETA DE CRISTAL ANCHA (HERO) --- */
+
 .hero-card {
   display: flex;
-  flex-direction: row; /* Lado a lado en PC */
-  align-items: center; /* Centrados verticalmente */
-  justify-content: space-between; /* Espacio entre texto e imagen */
+  flex-direction: row; 
+  align-items: center; 
+  justify-content: space-between; 
   
   width: 100%;
-  max-width: 1100px; /* Ancho máximo */
+  max-width: 1100px; 
   min-height: 500px;
   
-  background-color: rgba(255, 255, 255, 0.15); /* Cristal suave */
+  background-color: rgba(255, 255, 255, 0.15); 
   backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.3);
   border-radius: 30px;
@@ -33,25 +32,24 @@
   overflow: hidden;
 }
 
-/* --- LADO IZQUIERDO (TEXTO) --- */
+
 .left-content {
-  flex: 1; /* Ocupa el espacio disponible */
-  padding-right: 40px; /* Espacio para no chocar con el muñeco */
+  flex: 1;
+  padding-right: 40px; 
   z-index: 2;
   text-align: left;
 }
 
-/* Título y Barras de Audio juntos */
 .title-wrapper {
   display: flex;
-  align-items: flex-end; /* Alinear abajo para que las barras "pisen" el suelo */
+  align-items: flex-end; 
   gap: 15px;
   margin-bottom: 20px;
 }
 
 .main-title {
   font-family: 'Fredoka', 'Roboto', sans-serif;
-  font-size: 4rem; /* Grande */
+  font-size: 4rem; 
   font-weight: 800;
   color: #ffffff;
   margin: 0;
@@ -59,13 +57,13 @@
   text-shadow: 0 4px 10px rgba(0,0,0,0.2);
 }
 
-/* --- ANIMACIÓN DE BARRAS DE AUDIO --- */
+
 .sound-wave {
   display: flex;
   align-items: flex-end;
   gap: 6px;
-  height: 45px; /* Altura máxima de las barras */
-  padding-bottom: 5px; /* Ajuste fino */
+  height: 45px; 
+  padding-bottom: 5px; 
 }
 
 .bar {
@@ -93,10 +91,10 @@
   margin-bottom: 40px;
   font-weight: 400;
   line-height: 1.6;
-  max-width: 500px; /* Evita que el texto se estire demasiado */
+  max-width: 500px; 
 }
 
-/* Botones */
+
 .buttons-container {
   display: flex;
   gap: 20px;
@@ -127,7 +125,7 @@
   transform: translateY(-3px);
 }
 
-/* --- LADO DERECHO (IMAGEN) --- */
+
 .right-content {
   flex: 1;
   display: flex;
@@ -137,7 +135,7 @@
 
 .character-image {
   width: 100%;
-  max-width: 400px; /* Tamaño máximo controlado */
+  max-width: 400px; 
   height: auto;
   filter: drop-shadow(0 10px 20px rgba(0,0,0,0.3));
   animation: float 4s ease-in-out infinite;
@@ -148,10 +146,10 @@
   50% { transform: translateY(-15px); }
 }
 
-/* --- RESPONSIVE: MÓVIL (Menos de 900px) --- */
+
 @media (max-width: 900px) {
   .hero-card {
-    flex-direction: column-reverse; /* Imagen arriba, Texto abajo */
+    flex-direction: column-reverse; 
     padding: 30px;
     height: auto;
     text-align: center;
@@ -161,19 +159,19 @@
     padding-right: 0;
     display: flex;
     flex-direction: column;
-    align-items: center; /* Centrar todo en móvil */
+    align-items: center; 
   }
 
   .title-wrapper {
-    justify-content: center; /* Centrar título y barras */
+    justify-content: center; 
   }
 
   .main-title {
-    font-size: 3rem; /* Título un poco más chico */
+    font-size: 3rem; 
   }
 
   .character-image {
-    max-width: 280px; /* Muñeco más chico */
+    max-width: 280px; 
     margin-bottom: 30px;
   }
   

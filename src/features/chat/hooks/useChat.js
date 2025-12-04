@@ -1,86 +1,94 @@
-// fileName: src/hooks/useChat.js (VERSIÓN EDITADA)
-
+// src/features/chat/hooks/useChat.js
 import { useState, useEffect, useCallback } from 'react';
 import apiClient from '../../../api/apiClient';
-import { useThemeContext } from '../../../context/ThemeContext'; // <-- 1. Importamos el contexto del tema
+import { useThemeContext } from '../../../context/ThemeContext';
 
-export const useChat = (userId, recipientUser) => {
-  const { setThemeMode } = useThemeContext(); // <-- 2. Obtenemos la función para cambiar el tema
+export const useChat = (userId, selectedUser) => {
+  // Traemos el setter para actualizar la Sidebar al instante
+  const { setThemeMode } = useThemeContext(); 
+  
   const [messages, setMessages] = useState([]);
   const [socket, setSocket] = useState(null);
-  const recipientId = recipientUser?._id;
+  
+  const recipientId = selectedUser?._id || selectedUser?.id;
 
-  // --- NUEVA FUNCIÓN PARA ANALIZAR SENTIMIENTO Y CAMBIAR TEMA ---
+  // --- 1. FUNCIÓN QUE ACTUALIZA TU VIBE AL INSTANTE ---
   const analyzeAndSetTheme = useCallback(async (text) => {
-    // Evita analizar mensajes muy cortos o vacíos
-    if (!text || text.length < 5) return; 
+    if (!text || text.length < 2) return; 
 
     try {
-      // 3. Llama a tu (futuro) servicio de IA en el backend
-      // NOTA: Debes crear este endpoint en tu API de Node.js
+      // A) Pedimos la emoción a la IA
       const response = await apiClient.post('/api/v1/ai/sentiment', { text });
-      const mood = response.data.mood; // ej: "happy", "sad", "neutral"
+      const mood = response.data.mood; // ej: "felicidad"
       
-      console.log(`IA detectó sentimiento: ${mood}`);
+      console.log(`IA detectó: ${mood}`);
 
-      // 4. Actualiza el tema de toda la aplicación
-      setThemeMode(mood);
+      // B) ¡AQUÍ ESTÁ LA SOLUCIÓN!
+      // Forzamos la actualización de la Sidebar inmediatamente
+      if (mood) {
+        setThemeMode(mood);
+      }
+
+      // C) Actualizamos también el mensaje en la lista local para que el fondo del chat cambie
+      setMessages(prev => {
+        const nuevos = [...prev];
+        const index = nuevos.findIndex(m => m.sender === 'user' && m.text === text && !m.emocion);
+        
+        if (index !== -1) {
+            nuevos[index] = { ...nuevos[index], emocion: mood };
+        }
+        return nuevos;
+      });
 
     } catch (error) {
-      console.error("Error al analizar sentimiento:", error);
-      // En caso de error, podríamos volver al tema neutral para seguridad
-      setThemeMode('neutral');
+      console.error("Error analizando sentimiento:", error);
     }
   }, [setThemeMode]);
 
 
-  // --- LÓGICA DE WEBSOCKET (con integración de tema) ---
+  // --- 2. WEBSOCKET (Recibir mensajes) ---
   useEffect(() => {
     if (!userId || !recipientId) return;
-    // 1. OBTENER LA URL BASE DE LA API DESDE VARIABLES DE ENTORNO
-    const apiBaseUrl = process.env.REACT_APP_API_URL || 'http://localhost:3001';
+    
+    let apiBaseUrl = apiClient.defaults.baseURL || 'http://localhost:4000';
+    if (apiBaseUrl.startsWith('/')) apiBaseUrl = window.location.origin + apiBaseUrl; 
+    const wsUrl = apiBaseUrl.replace(/^http/, 'ws').replace(/\/api\/v1\/?$/, '');
 
-    // 2. CONVERTIR HTTP A WEBSOCKET (ws/wss)
-    const wsUrl = apiBaseUrl.replace(/^http/, 'ws');
-
-    console.log('Intentando conectar WS a:', wsUrl); // Para depurar
     const ws = new WebSocket(wsUrl);
+    
     ws.onopen = () => {
-      console.log('✅ Conectado al WebSocket');
       ws.send(JSON.stringify({ type: 'init', userId }));
     };
 
     ws.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      const isRelevant = (data.remitenteId === userId && data.recipientId === recipientId) || (data.remitenteId === recipientId && data.recipientId === userId);
-      
-      if (isRelevant && data.remitenteId !== userId) {
-        const newMessage = {
-            ...data,
-            text: data.text,
-            timestamp: data.timestamp,
-            date: new Date(data.timestamp).toLocaleDateString(),
-            sender: data.remitenteId === userId ? 'user' : 'otro',
-        };
-        setMessages(prev => [...prev, newMessage]);
+      try {
+        const data = JSON.parse(event.data);
+        const isRelevant = 
+            (data.remitenteId === userId && data.recipientId === recipientId) || 
+            (data.remitenteId === recipientId && data.recipientId === userId);
         
-        // --> 5. Analiza el sentimiento del mensaje RECIBIDO (si no es nuestro)
-        if (data.remitenteId !== userId) {
-          analyzeAndSetTheme(data.text);
+        if (isRelevant && data.remitenteId !== userId) {
+          const newMessage = {
+              ...data,
+              text: data.text,
+              timestamp: data.timestamp || new Date().toISOString(),
+              sender: 'otro',
+              emocion: data.emocion 
+          };
+          setMessages(prev => [...prev, newMessage]);
         }
-      }
+      } catch (e) { console.error("Error WS:", e); }
     };
 
     ws.onerror = (err) => console.error('WebSocket error:', err);
-    ws.onclose = () => console.log('❌ WebSocket cerrado');
     setSocket(ws);
 
     return () => ws.close();
-  }, [userId, recipientId, analyzeAndSetTheme]); // <-- Se añade analyzeAndSetTheme a las dependencias
+  }, [userId, recipientId]);
 
 
-  // --- LÓGICA PARA OBTENER Y BORRAR HISTORIAL (sin cambios) ---
-  const fetchChatHistory = useCallback(async () => {
+  // --- 3. CARGAR HISTORIAL ---
+  const fetchMessages = useCallback(async () => {
     if (!userId || !recipientId) return;
     try {
       const response = await apiClient.get(`/api/v1/chat/history/${userId}/${recipientId}`);
@@ -88,49 +96,58 @@ export const useChat = (userId, recipientUser) => {
         ...msg,
         text: msg.texto,
         timestamp: msg.fecha,
-        date: new Date(msg.fecha).toLocaleDateString(),
-        sender: msg.remitenteId === userId ? 'user' : 'otro'
+        // Identificación robusta del sender
+        sender: (msg.remitenteId === userId || msg.remitenteId?._id === userId) ? 'user' : 'otro',
+        emocion: msg.emocion 
       }));
       setMessages(formatted);
     } catch (error) {
-      console.error('Error fetching chat history:', error);
+      console.error('Error historial:', error);
       setMessages([]);
     }
   }, [userId, recipientId]);
 
   useEffect(() => {
-    fetchChatHistory();
-  }, [fetchChatHistory]);
+    fetchMessages();
+  }, [fetchMessages]);
 
-  const clearHistory = async () => { /* ... sin cambios ... */ };
-
-
-// En src/hooks/useChat.js
-
-const sendMessage = (text, userName) => {
-  if (!text.trim() || !socket || socket.readyState !== WebSocket.OPEN) return;
-
-  // 1. Prepara el objeto del nuevo mensaje localmente
-  const newMessage = {
-    remitenteId: userId,
-    recipientId,
-    remitenteNombre: userName,
-    text,
-    timestamp: new Date().toISOString(),
-    date: new Date().toLocaleDateString(),
-    sender: 'user',
+  const clearHistory = async () => {
+      if (!userId || !recipientId) return;
+      try {
+          await apiClient.delete(`/api/v1/chat/history/${userId}/${recipientId}`);
+          setMessages([]);
+      } catch (e) { console.error(e); }
   };
 
-  // 2. Envía el mensaje al servidor
-  socket.send(JSON.stringify({ userId, recipientId, text, remitenteNombre: userName }));
-  
-  // 3. ACTUALIZACIÓN OPTIMISTA: Añade el mensaje al estado local INMEDIATAMENTE
-  setMessages(prev => [...prev, newMessage]);
+  // --- 4. ENVIAR MENSAJE ---
+  const sendMessage = async (text, userName) => {
+    if (!text.trim()) return;
 
-  // 4. Llama a la IA
-  analyzeAndSetTheme(text);
+    // Agregamos mensaje local (sin emoción aún)
+    const newMessage = {
+      remitenteId: userId,
+      recipientId,
+      remitenteNombre: userName,
+      text,
+      timestamp: new Date().toISOString(),
+      sender: 'user',
+      emocion: null 
+    };
+    
+    setMessages(prev => [...prev, newMessage]);
+
+    if (socket && socket.readyState === WebSocket.OPEN) {
+        socket.send(JSON.stringify({ userId, recipientId, text, remitenteNombre: userName }));
+    }
+
+    // Llamamos a la función que SÍ actualiza la UI al terminar
+    await analyzeAndSetTheme(text);
+  };
+
+  return {
+    messages,
+    sendMessage,
+    clearHistory,
+    refreshMessages: fetchMessages
+  };
 };
-
-  return { messages, sendMessage, clearHistory };
-};
-
