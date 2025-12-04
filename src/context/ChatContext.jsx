@@ -1,4 +1,4 @@
-// fileName: src/context/ChatContext.jsx (VERSIÓN CORREGIDA PARA AMIGOS)
+// fileName: src/context/ChatContext.jsx (VERSIÓN CORREGIDA PARA AMIGOS + VIBES)
 
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import apiClient from '../api/apiClient';
@@ -14,10 +14,14 @@ export const useChatContext = () => {
 };
 
 export const ChatProvider = ({ children }) => {
-  const [users, setUsers] = useState([]); // <-- Esta es la lista de AMIGOS
+  const [users, setUsers] = useState([]); // Lista de AMIGOS
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
   const [currentUserId, setCurrentUserId] = useState(null);
+  
+  // ✅ NUEVO: MAPA DE VIBES DE AMIGOS
+  // Almacena { 'id_usuario': 'emocion_actual' }
+  const [vibeMap, setVibeMap] = useState({});
 
   useEffect(() => {
     const storedUser = JSON.parse(sessionStorage.getItem('user'));
@@ -25,10 +29,9 @@ export const ChatProvider = ({ children }) => {
       setCurrentUserId(storedUser._id);
     }
 
-    // 1. AHORA LLAMAMOS AL ENDPOINT DE "AMIGOS"
     const fetchMyFriends = async () => {
       try {
-        // !!! (NECESITAS CREAR ESTE ENDPOINT EN TU BACKEND)
+        // Asegúrate de que este endpoint exista en tu backend
         const response = await apiClient.get('/api/v1/friends/my-friends');
         const data = response.data;
         setUsers(data);
@@ -58,23 +61,24 @@ export const ChatProvider = ({ children }) => {
     setFilteredUsers(filtered);
   };
   
-  // 2. AÑADIMOS LA FUNCIÓN PARA ACEPTAR SOLICITUDES
   const addFriendToContext = (newFriend) => {
-    // Añade el nuevo amigo al estado de 'users' (amigos)
     setUsers(prevUsers => {
-      // Evitar duplicados
-      if (prevUsers.find(u => u._id === newFriend._id)) {
-        return prevUsers;
-      }
+      if (prevUsers.find(u => u._id === newFriend._id)) return prevUsers;
       return [...prevUsers, newFriend];
     });
-
-    // Añade también a la lista filtrada para que aparezca de inmediato
     setFilteredUsers(prevFiltered => {
-      if (prevFiltered.find(u => u._id === newFriend._id)) {
-        return prevFiltered;
-      }
+      if (prevFiltered.find(u => u._id === newFriend._id)) return prevFiltered;
       return [...prevFiltered, newFriend];
+    });
+  };
+
+  // ✅ NUEVA FUNCIÓN: ACTUALIZAR EL VIBE DE UN AMIGO
+  const updateUserVibe = (userId, emotion) => {
+    if (!userId || !emotion) return;
+    setVibeMap(prev => {
+        // Evitamos renderizados innecesarios si la emoción es la misma
+        if (prev[userId] === emotion) return prev;
+        return { ...prev, [userId]: emotion.trim() };
     });
   };
   
@@ -84,7 +88,9 @@ export const ChatProvider = ({ children }) => {
     currentUserId,
     handleSelectUser,
     handleSearchChange,
-    addFriendToContext, // <-- 3. EXPONEMOS LA NUEVA FUNCIÓN
+    addFriendToContext,
+    vibeMap,          // Exportamos el mapa de vibes
+    updateUserVibe,   // Exportamos la función para actualizarlo
   };
 
   return <ChatContext.Provider value={value}>{children}</ChatContext.Provider>;

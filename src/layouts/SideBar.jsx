@@ -98,7 +98,7 @@ const Sidebar = () => {
               {isOpen && (
                 <Box sx={{ textAlign: 'center' }}>
                   <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.5)', display: 'block', fontSize: '0.65rem' }}>
-                    VIBE DETECTADA
+                    TU ESTADO DE ANIMO ES:
                   </Typography>
                   <Typography variant="body2" sx={{ color: 'white', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: 0.5, justifyContent: 'center' }}>
                     <AutoAwesome sx={{ fontSize: 12, color: APP_COLORS.secondary }} /> 
@@ -128,7 +128,7 @@ const Sidebar = () => {
       <Dialog open={openQr} onClose={() => setOpenQr(false)} PaperProps={{ sx: { bgcolor: 'transparent', boxShadow: 'none' } }}>
         <GlassCard sx={{ p: 4, alignItems: 'center', maxWidth: 350, textAlign: 'center', border: `1px solid ${APP_COLORS.glassBorder}`, position: 'relative' }}>
           <IconButton onClick={() => setOpenQr(false)} sx={{ position: 'absolute', top: 10, right: 10, color: 'rgba(255,255,255,0.6)' }}><Close /></IconButton>
-          <Typography variant="h5" sx={{ fontWeight: 700, color: 'white', mb: 1 }}>Llévanos contigo 📱</Typography>
+          <Typography variant="h5" sx={{ fontWeight: 700, color: 'white', mb: 1 }}>Llévanos contigo </Typography>
           <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.8)', mb: 3 }}>Escanea para descargar la App.</Typography>
           <Box sx={{ p: 2, bgcolor: 'white', borderRadius: '20px', boxShadow: '0 0 20px rgba(255,255,255,0.3)', mb: 3 }}>
             <img src={QR_IMAGE_URL} alt="QR Code" style={{ width: '100%', height: 'auto', display: 'block' }} />

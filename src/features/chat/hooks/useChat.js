@@ -1,52 +1,41 @@
-// src/features/chat/hooks/useChat.js
 import { useState, useEffect, useCallback } from 'react';
 import apiClient from '../../../api/apiClient';
+// 1. IMPORTAMOS EL CONTEXTO DEL CHAT
+import { useChatContext } from '../../../context/ChatContext';
 import { useThemeContext } from '../../../context/ThemeContext';
 
 export const useChat = (userId, selectedUser) => {
-  // Traemos el setter para actualizar la Sidebar al instante
-  const { setThemeMode } = useThemeContext(); 
+  const { setThemeMode } = useThemeContext();
   
+  // 2. TRAEMOS LA FUNCIÓN PARA GUARDAR VIBES
+  const { updateUserVibe } = useChatContext(); 
+
   const [messages, setMessages] = useState([]);
   const [socket, setSocket] = useState(null);
   
   const recipientId = selectedUser?._id || selectedUser?.id;
 
-  // --- 1. FUNCIÓN QUE ACTUALIZA TU VIBE AL INSTANTE ---
   const analyzeAndSetTheme = useCallback(async (text) => {
     if (!text || text.length < 2) return; 
-
     try {
-      // A) Pedimos la emoción a la IA
       const response = await apiClient.post('/api/v1/ai/sentiment', { text });
-      const mood = response.data.mood; // ej: "felicidad"
+      const mood = response.data.mood; 
       
-      console.log(`IA detectó: ${mood}`);
+      if (mood) setThemeMode(mood); // Tu sidebar
 
-      // B) ¡AQUÍ ESTÁ LA SOLUCIÓN!
-      // Forzamos la actualización de la Sidebar inmediatamente
-      if (mood) {
-        setThemeMode(mood);
-      }
-
-      // C) Actualizamos también el mensaje en la lista local para que el fondo del chat cambie
       setMessages(prev => {
         const nuevos = [...prev];
         const index = nuevos.findIndex(m => m.sender === 'user' && m.text === text && !m.emocion);
-        
         if (index !== -1) {
             nuevos[index] = { ...nuevos[index], emocion: mood };
         }
         return nuevos;
       });
 
-    } catch (error) {
-      console.error("Error analizando sentimiento:", error);
-    }
+    } catch (error) { console.error(error); }
   }, [setThemeMode]);
 
-
-  // --- 2. WEBSOCKET (Recibir mensajes) ---
+  // --- WEBSOCKET ---
   useEffect(() => {
     if (!userId || !recipientId) return;
     
@@ -55,10 +44,7 @@ export const useChat = (userId, selectedUser) => {
     const wsUrl = apiBaseUrl.replace(/^http/, 'ws').replace(/\/api\/v1\/?$/, '');
 
     const ws = new WebSocket(wsUrl);
-    
-    ws.onopen = () => {
-      ws.send(JSON.stringify({ type: 'init', userId }));
-    };
+    ws.onopen = () => ws.send(JSON.stringify({ type: 'init', userId }));
 
     ws.onmessage = (event) => {
       try {
@@ -67,7 +53,13 @@ export const useChat = (userId, selectedUser) => {
             (data.remitenteId === userId && data.recipientId === recipientId) || 
             (data.remitenteId === recipientId && data.recipientId === userId);
         
+        // Si llega un mensaje de mi amigo...
         if (isRelevant && data.remitenteId !== userId) {
+          // ... ACTUALIZAMOS SU VIBE EN LA LISTA GLOBAL
+          if (data.emocion) {
+             updateUserVibe(data.remitenteId, data.emocion);
+          }
+
           const newMessage = {
               ...data,
               text: data.text,
@@ -79,75 +71,58 @@ export const useChat = (userId, selectedUser) => {
         }
       } catch (e) { console.error("Error WS:", e); }
     };
-
-    ws.onerror = (err) => console.error('WebSocket error:', err);
     setSocket(ws);
-
     return () => ws.close();
-  }, [userId, recipientId]);
+  }, [userId, recipientId, updateUserVibe]); // Agregamos updateUserVibe a deps
 
 
-  // --- 3. CARGAR HISTORIAL ---
+  // --- CARGAR HISTORIAL ---
   const fetchMessages = useCallback(async () => {
     if (!userId || !recipientId) return;
     try {
       const response = await apiClient.get(`/api/v1/chat/history/${userId}/${recipientId}`);
+      
       const formatted = response.data.mensajes.map(msg => ({
         ...msg,
         text: msg.texto,
         timestamp: msg.fecha,
-        // Identificación robusta del sender
         sender: (msg.remitenteId === userId || msg.remitenteId?._id === userId) ? 'user' : 'otro',
         emocion: msg.emocion 
       }));
       setMessages(formatted);
+
+      // --- AQUÍ ESTÁ EL TRUCO ---
+      // Buscamos el último mensaje DE MI AMIGO en el historial
+      const ultimoAmigo = [...formatted].reverse().find(m => m.sender === 'otro' && m.emocion);
+      
+      // Si encontramos uno, actualizamos su bolita en la lista de contactos
+      if (ultimoAmigo) {
+          updateUserVibe(recipientId, ultimoAmigo.emocion);
+      }
+
     } catch (error) {
       console.error('Error historial:', error);
       setMessages([]);
     }
-  }, [userId, recipientId]);
+  }, [userId, recipientId, updateUserVibe]); // Agregamos updateUserVibe a deps
 
-  useEffect(() => {
-    fetchMessages();
-  }, [fetchMessages]);
+  useEffect(() => { fetchMessages(); }, [fetchMessages]);
 
   const clearHistory = async () => {
       if (!userId || !recipientId) return;
-      try {
-          await apiClient.delete(`/api/v1/chat/history/${userId}/${recipientId}`);
-          setMessages([]);
-      } catch (e) { console.error(e); }
+      try { await apiClient.delete(`/api/v1/chat/history/${userId}/${recipientId}`); setMessages([]); } 
+      catch (e) { console.error(e); }
   };
 
-  // --- 4. ENVIAR MENSAJE ---
   const sendMessage = async (text, userName) => {
     if (!text.trim()) return;
-
-    // Agregamos mensaje local (sin emoción aún)
-    const newMessage = {
-      remitenteId: userId,
-      recipientId,
-      remitenteNombre: userName,
-      text,
-      timestamp: new Date().toISOString(),
-      sender: 'user',
-      emocion: null 
-    };
-    
+    const newMessage = { remitenteId: userId, recipientId, remitenteNombre: userName, text, timestamp: new Date().toISOString(), sender: 'user', emocion: null };
     setMessages(prev => [...prev, newMessage]);
-
     if (socket && socket.readyState === WebSocket.OPEN) {
         socket.send(JSON.stringify({ userId, recipientId, text, remitenteNombre: userName }));
     }
-
-    // Llamamos a la función que SÍ actualiza la UI al terminar
     await analyzeAndSetTheme(text);
   };
 
-  return {
-    messages,
-    sendMessage,
-    clearHistory,
-    refreshMessages: fetchMessages
-  };
+  return { messages, sendMessage, clearHistory, refreshMessages: fetchMessages };
 };
