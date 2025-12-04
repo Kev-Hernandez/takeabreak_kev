@@ -1,52 +1,43 @@
-// fileName: src/features/users/components/UserContactList.jsx (VERSIÓN CON TABS)
-
+// src/features/users/components/UserContactList.jsx
 import React, { useState, useEffect } from 'react';
 import { 
-  InputAdornment, Badge, Typography, Divider, Box, AppBar, Tabs, Tab 
-} from '@mui/material'; // 1. Importamos Tabs, Tab, AppBar, Box
-import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
-import SearchIcon from '@mui/icons-material/Search';
-import apiClient from '../../../api/apiClient';
-import IconButton from '@mui/material/IconButton';
-import AddIcon from '@mui/icons-material/Add';
-import CheckIcon from '@mui/icons-material/Check';   // 2. Icono para Aceptar
-import CloseIcon from '@mui/icons-material/Close'; // 2. Icono para Rechazar
+  Box, Tabs, Tab, TextField, InputAdornment, Avatar, Typography, IconButton, Badge, Tooltip, CircularProgress
+} from '@mui/material';
+import { Search, Add, Check, Close, ChatBubbleOutline } from '@mui/icons-material';
 
+// 1. Importamos el Diseño Nuevo y Constantes
+import GlassCard from '../../../components/common/GlassCard';
+import { APP_COLORS } from '../../../utils/constants';
+
+// 2. Importamos tu Lógica y Contextos
+import apiClient from '../../../api/apiClient';
 import { useChatContext } from '../../../context/ChatContext';
 import { useThemeContext } from '../../../context/ThemeContext';
 
-import {
-  ListContainer, Header, SearchTextField, ContactList, ContactItem, StyledAvatar
-} from './UserContactList.styles';
-
 const UserContactList = () => {
-  // 3. Quitamos handleSearchChange, la búsqueda será 100% local
+  // --- LÓGICA ORIGINAL (RECUPERADA) ---
   const { users, selectedUser, handleSelectUser, currentUserId } = useChatContext();
   const { setThemeMode } = useThemeContext(); 
   
-  const [searchTerm, setSearchTerm] = useState('');
-  const [currentTab, setCurrentTab] = useState(0); // 4. Estado para la pestaña activa
+  const [tab, setTab] = useState(0);
+  const [search, setSearch] = useState('');
 
-  // Estado para la pestaña "Explorar"
+  // Estados para datos externos (Explorar / Solicitudes)
   const [allUsers, setAllUsers] = useState([]);
   const [loadingExplore, setLoadingExplore] = useState(false);
-  const [errorExplore, setErrorExplore] = useState('');
-
-  // 5. Nuevo estado para la pestaña "Solicitudes"
+  
   const [requests, setRequests] = useState([]);
   const [loadingRequests, setLoadingRequests] = useState(false);
-  const [errorRequests, setErrorRequests] = useState('');
 
-  // 6. useEffect ahora carga AMBAS listas (explorar y solicitudes)
+  // Carga inicial de datos
   useEffect(() => {
     const fetchAllUsers = async () => {
       setLoadingExplore(true);
-      setErrorExplore('');
       try {
         const response = await apiClient.get('/api/v1/users/');
         setAllUsers(response.data);
       } catch (err) {
-        setErrorExplore('No se pudieron cargar los usuarios.');
+        console.error("Error cargando usuarios", err);
       } finally {
         setLoadingExplore(false);
       }
@@ -54,13 +45,11 @@ const UserContactList = () => {
 
     const fetchRequests = async () => {
       setLoadingRequests(true);
-      setErrorRequests('');
       try {
-        // !!! (NECESITAS CREAR ESTE ENDPOINT)
         const response = await apiClient.get('/api/v1/friends/requests');
         setRequests(response.data);
       } catch (err) {
-        setErrorRequests('No se pudieron cargar las solicitudes.');
+        console.error("Error cargando solicitudes", err);
       } finally {
         setLoadingRequests(false);
       }
@@ -70,197 +59,210 @@ const UserContactList = () => {
     fetchRequests();
   }, []);
 
-  // --- Handlers de Acciones ---
+  // --- HANDLERS (RECUPERADOS) ---
 
   const handleSendRequest = async (recipientId) => {
     try {
       const response = await apiClient.post('/api/v1/friends/request', { recipientId });
       alert(response.data.message);
-      setAllUsers(prevUsers => prevUsers.filter(u => u._id !== recipientId));
+      // Actualizamos la lista localmente para no recargar
+      setAllUsers(prev => prev.filter(u => u._id !== recipientId));
     } catch (err) {
-      alert(err.response?.data?.message || 'No se pudo enviar la solicitud.');
+      alert(err.response?.data?.message || 'Error al enviar solicitud.');
     }
   };
 
-  // 7. Nuevos Handlers para Aceptar/Rechazar (NECESITAS CREAR ESTOS ENDPOINTS)
   const handleRequestResponse = async (senderId, action) => {
     const endpoint = action === 'accept' ? '/api/v1/friends/accept' : '/api/v1/friends/reject';
     try {
       await apiClient.post(endpoint, { senderId });
-      // Si fue exitoso, elimina la solicitud de la lista local
       setRequests(prev => prev.filter(req => req.sender._id !== senderId));
-      alert(`Solicitud ${action === 'accept' ? 'aceptada' : 'rechazada'}`);
-      // Idealmente, si aceptas, también deberías refrescar la lista de amigos (users)
+      // Nota: Si aceptas, deberías idealmente recargar 'users' del contexto, 
+      // pero por ahora actualizamos la UI local.
     } catch (err) {
       alert('No se pudo procesar la solicitud.');
     }
   };
 
-
-  // --- Handlers de UI ---
-
-  const handleSearch = (e) => {
-    setSearchTerm(e.target.value); // Búsqueda ahora es solo local
-  };
-
-  const handleTabChange = (event, newValue) => {
-    setSearchTerm(''); // Resetea la búsqueda al cambiar de pestaña
-    setCurrentTab(newValue);
-  };
-
   const handleUserClick = (user) => {
     handleSelectUser(user);
-    setThemeMode('neutral');
+    setThemeMode('neutral'); // Resetea el tema al cambiar de chat
   };
 
-  // --- Lógica de Filtrado ---
-  
-  const lowerSearchTerm = searchTerm.toLowerCase();
+  // --- FILTROS ---
+  const lowerSearch = search.toLowerCase();
 
-  // A. Filtramos Amigos
-  const filteredFriends = users
-    .filter(u => u._id !== currentUserId)
-    .filter(u =>
-      u.nombre.toLowerCase().includes(lowerSearchTerm) ||
-      u.apellido.toLowerCase().includes(lowerSearchTerm)
-    );
-
-  // B. Filtramos Globales (Excluyendo amigos y a sí mismo)
-  const friendIds = new Set(users.map(u => u._id));
-  friendIds.add(currentUserId); 
-  
-  const filteredGlobal = allUsers
-    .filter(u => !friendIds.has(u._id))
-    .filter(u =>
-      u.nombre.toLowerCase().includes(lowerSearchTerm) ||
-      u.apellido.toLowerCase().includes(lowerSearchTerm)
-    );
-
-  // C. Filtramos Solicitudes (asumiendo que el sender es un objeto)
-  const filteredRequests = requests.filter(req =>
-    req.sender.nombre.toLowerCase().includes(lowerSearchTerm) ||
-    req.sender.apellido.toLowerCase().includes(lowerSearchTerm)
+  // 1. Amigos (Vienen del Contexto)
+  const filteredFriends = users.filter(u => 
+    (u.nombre.toLowerCase().includes(lowerSearch) || u.apellido.toLowerCase().includes(lowerSearch)) &&
+    u._id !== currentUserId
   );
 
-  // --- Componente de Renderizado de Lista ---
+  // 2. Explorar (Todos - Amigos - Yo)
+  const friendIds = new Set(users.map(u => u._id));
+  friendIds.add(currentUserId);
+  const filteredExplore = allUsers
+    .filter(u => !friendIds.has(u._id))
+    .filter(u => 
+      u.nombre.toLowerCase().includes(lowerSearch) || u.apellido.toLowerCase().includes(lowerSearch)
+    );
 
-  const renderListContent = () => {
-    if (currentTab === 0) { // Amigos
-      return filteredFriends.map((user) => (
-        <ContactItem
-          key={user._id}
-          onClick={() => handleUserClick(user)}
-          isSelected={selectedUser?._id === user._id}
+  // 3. Solicitudes
+  const filteredRequests = requests.filter(req => 
+    req.sender.nombre.toLowerCase().includes(lowerSearch) || 
+    req.sender.apellido.toLowerCase().includes(lowerSearch)
+  );
+
+
+  // --- RENDERIZADO (DISEÑO NUEVO) ---
+  
+  // Función auxiliar para renderizar items con el estilo CRISTAL
+  const renderItem = (user, type, extraActions = null) => (
+    <Box 
+      key={user._id}
+      onClick={type === 'friend' ? () => handleUserClick(user) : undefined}
+      sx={{
+        display: 'flex', alignItems: 'center', p: 1.5, mb: 1, borderRadius: '15px',
+        cursor: type === 'friend' ? 'pointer' : 'default',
+        bgcolor: selectedUser?._id === user._id ? 'rgba(255,255,255,0.25)' : 'transparent',
+        border: selectedUser?._id === user._id ? `1px solid ${APP_COLORS.glassBorder}` : '1px solid transparent',
+        transition: 'all 0.2s',
+        '&:hover': { bgcolor: 'rgba(255,255,255,0.15)', transform: 'translateX(4px)' }
+      }}
+    >
+      <Badge variant="dot" color="success" invisible={type !== 'friend'}>
+        <Avatar 
+            src={user.avatar ? `${apiClient.defaults.baseURL}/public/avatares/${user.avatar}` : ''} 
+            sx={{ width: 42, height: 42, border: '2px solid white', boxShadow: '0 2px 8px rgba(0,0,0,0.2)' }}
         >
-          <Badge variant="dot" color="success">
-            <StyledAvatar src={user.avatar ? `${apiClient.defaults.baseURL}/public/avatares/${user.avatar}` : ''} alt={user.nombre} />
-          </Badge>
-          <div>
-            <Typography variant="subtitle2" sx={{ color: '#E0E1DD' }}>{user.nombre} {user.apellido}</Typography>
-            <Typography variant="caption" sx={{ color: '#A9A9A9' }}>Chatear</Typography>
-          </div>
-        </ContactItem>
-      ));
-    }
-
-    if (currentTab === 1) { // Explorar
-      if (loadingExplore) return <Typography sx={{ p: 2, color: '#A9A9A9' }}>Cargando...</Typography>;
-      if (errorExplore) return <Typography sx={{ p: 2, color: 'error.main' }}>{errorExplore}</Typography>;
-      return filteredGlobal.map((user) => (
-        <ContactItem key={user._id} isSelected={false}>
-          <StyledAvatar src={user.avatar ? `${apiClient.defaults.baseURL}/public/avatares/${user.avatar}` : ''} alt={user.nombre} />
-          <div style={{ flexGrow: 1 }}>
-            <Typography variant="subtitle2" sx={{ color: '#E0E1DD' }}>{user.nombre} {user.apellido}</Typography>
-          </div>
-          <IconButton title="Enviar solicitud" size="small" onClick={() => handleSendRequest(user._id)}>
-            <AddIcon fontSize="small" sx={{ color: '#E0E1DD' }} />
-          </IconButton>
-        </ContactItem>
-      ));
-    }
-
-    if (currentTab === 2) { // Solicitudes
-      if (loadingRequests) return <Typography sx={{ p: 2, color: '#A9A9A9' }}>Cargando...</Typography>;
-      if (errorRequests) return <Typography sx={{ p: 2, color: 'error.main' }}>{errorRequests}</Typography>;
-      if (filteredRequests.length === 0) return <Typography sx={{ p: 2, color: '#A9A9A9' }}>No hay solicitudes pendientes.</Typography>;
+            {user.nombre[0]}
+        </Avatar>
+      </Badge>
       
-      return filteredRequests.map((req) => (
-        <ContactItem key={req._id} isSelected={false}>
-          <StyledAvatar src={req.sender.avatar ? `${apiClient.defaults.baseURL}/public/avatares/${req.sender.avatar}` : ''} alt={req.sender.nombre} />
-          <div style={{ flexGrow: 1 }}>
-            <Typography variant="subtitle2" sx={{ color: '#E0E1DD' }}>{req.sender.nombre} {req.sender.apellido}</Typography>
-          </div>
-          <IconButton title="Aceptar" size="small" onClick={() => handleRequestResponse(req.sender._id, 'accept')}>
-            <CheckIcon fontSize="small" sx={{ color: '#00F5D4' }} />
-          </IconButton>
-          <IconButton title="Rechazar" size="small" onClick={() => handleRequestResponse(req.sender._id, 'reject')}>
-            <CloseIcon fontSize="small" sx={{ color: '#FF4136' }} />
-          </IconButton>
-        </ContactItem>
-      ));
-    }
-    return null;
-  };
+      <Box sx={{ ml: 2, flexGrow: 1 }}>
+        <Typography sx={{ fontWeight: 600, color: 'white' }}>
+            {user.nombre} {user.apellido}
+        </Typography>
+        {type === 'friend' && (
+            <Typography variant="caption" sx={{ color: APP_COLORS.textDim, display: 'flex', alignItems: 'center', gap: 0.5 }}>
+               <ChatBubbleOutline sx={{ fontSize: 12 }}/> Chatear
+            </Typography>
+        )}
+      </Box>
+
+      {/* Botones de Acción (Agregar, Aceptar, Rechazar) */}
+      <Box sx={{ display: 'flex', gap: 1 }}>
+        {extraActions}
+      </Box>
+    </Box>
+  );
 
   return (
-    <ListContainer>
-      {/* 8. Reemplazamos el Header por la barra de Pestañas (Tabs) */}
-      <AppBar 
-        position="static" 
-        sx={{ 
-          backgroundColor: 'transparent', // Fondo transparente
-          boxShadow: 'none', // Sin sombra
-          borderBottom: '1px solid rgba(255, 255, 255, 0.12)' // Borde sutil
-        }}
-      >
-        <Tabs
-          value={currentTab}
-          onChange={handleTabChange}
-          indicatorColor="primary" // Color del indicador
-          textColor="inherit"
+    <GlassCard>
+      {/* 1. HEADER CON TABS BLANCOS */}
+      <Box sx={{ borderBottom: `1px solid ${APP_COLORS.glassBorder}` }}>
+        <Tabs 
+          value={tab} 
+          onChange={(e, v) => { setTab(v); setSearch(''); }} 
           variant="fullWidth"
-          sx={{
-            '& .MuiTabs-indicator': {
-              backgroundColor: '#00F5D4', // Color de la línea de abajo
-            },
-            '& .MuiTab-root': {
-              color: '#A9A9A9', // Color del texto
-              minWidth: 'auto',
-              fontSize: '0.8rem',
-            },
-            '& .Mui-selected': {
-              color: '#FFFFFF !important', // Color del texto seleccionado
-            },
+          sx={{ 
+            minHeight: '48px',
+            '& .MuiTabs-indicator': { bgcolor: APP_COLORS.secondary, height: '3px', borderRadius: '3px' },
+            '& .MuiTab-root': { 
+                color: 'rgba(255,255,255,0.6)', 
+                textTransform: 'none', 
+                fontWeight: 700,
+                transition: '0.3s',
+                '&.Mui-selected': { color: 'white' }
+            }
           }}
         >
           <Tab label="Amigos" />
           <Tab label="Explorar" />
           <Tab 
-            label="Solicitudes" 
-            icon={
-              requests.length > 0 ? 
-              <Badge badgeContent={requests.length} color="error" sx={{ ml: 1.5 }} /> : 
-              null
+            label={
+              <Badge badgeContent={requests.length} color="error" sx={{ '& .MuiBadge-badge': { right: -12, top: 2 } }}>
+                Solicitudes
+              </Badge>
             } 
-            iconPosition="end"
-            sx={{ flexDirection: 'row-reverse', gap: '4px' }}
           />
         </Tabs>
-      </AppBar>
-      
-      <SearchTextField
-        label={`Buscar en ${['Amigos', 'Explorar', 'Solicitudes'][currentTab]}...`}
-        variant="outlined"
-        fullWidth
-        InputProps={{ startAdornment: (<InputAdornment position="start"><SearchIcon /></InputAdornment>) }}
-        value={searchTerm}
-        onChange={handleSearch}
-      />
-      
-      <ContactList>
-        {renderListContent()}
-      </ContactList>
-    </ListContainer>
+      </Box>
+
+      {/* 2. BARRA DE BÚSQUEDA TRANSPARENTE */}
+      <Box sx={{ p: 2, pb: 1 }}>
+        <TextField
+          fullWidth 
+          placeholder={`Buscar en ${['amigos', 'todo el mundo', 'solicitudes'][tab]}...`}
+          variant="outlined" 
+          size="small"
+          value={search} 
+          onChange={(e) => setSearch(e.target.value)}
+          sx={{
+            '& .MuiOutlinedInput-root': {
+              bgcolor: 'rgba(255,255,255,0.1)', 
+              borderRadius: '20px', 
+              color: 'white',
+              '& fieldset': { borderColor: 'rgba(255,255,255,0.2)' },
+              '&:hover fieldset': { borderColor: 'white' },
+              '&.Mui-focused fieldset': { borderColor: APP_COLORS.secondary }
+            }
+          }}
+          InputProps={{
+            startAdornment: <InputAdornment position="start"><Search sx={{ color: 'rgba(255,255,255,0.7)' }}/></InputAdornment>
+          }}
+        />
+      </Box>
+
+      {/* 3. LISTA DE USUARIOS (SCROLL INTERNO) */}
+      <Box sx={{ 
+        flex: 1, 
+        overflowY: 'auto', 
+        px: 2, 
+        pb: 2,
+        '&::-webkit-scrollbar': { width: '4px' },
+        '&::-webkit-scrollbar-thumb': { bgcolor: 'rgba(255,255,255,0.3)', borderRadius: '4px' }
+      }}>
+        
+        {/* CASO 0: AMIGOS */}
+        {tab === 0 && (
+            filteredFriends.length > 0 ? filteredFriends.map(u => renderItem(u, 'friend')) : 
+            <Typography align="center" sx={{ mt: 4, color: APP_COLORS.textDim }}>No se encontraron amigos.</Typography>
+        )}
+
+        {/* CASO 1: EXPLORAR */}
+        {tab === 1 && (
+            loadingExplore ? <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}><CircularProgress color="inherit" /></Box> :
+            filteredExplore.length > 0 ? filteredExplore.map(u => renderItem(u, 'explore', (
+                <Tooltip title="Enviar Solicitud">
+                    <IconButton size="small" onClick={(e) => { e.stopPropagation(); handleSendRequest(u._id); }} sx={{ bgcolor: 'rgba(255,255,255,0.1)', color: 'white', '&:hover': { bgcolor: APP_COLORS.secondary } }}>
+                        <Add fontSize="small"/>
+                    </IconButton>
+                </Tooltip>
+            ))) : <Typography align="center" sx={{ mt: 4, color: APP_COLORS.textDim }}>No hay usuarios nuevos.</Typography>
+        )}
+
+        {/* CASO 2: SOLICITUDES */}
+        {tab === 2 && (
+            loadingRequests ? <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}><CircularProgress color="inherit" /></Box> :
+            filteredRequests.length > 0 ? filteredRequests.map(req => renderItem(req.sender, 'request', (
+                <>
+                    <Tooltip title="Aceptar">
+                        <IconButton size="small" onClick={(e) => { e.stopPropagation(); handleRequestResponse(req.sender._id, 'accept'); }} sx={{ bgcolor: 'rgba(0,255,0,0.1)', color: '#4caf50', border: '1px solid #4caf50', '&:hover': { bgcolor: '#4caf50', color: 'white' } }}>
+                            <Check fontSize="small"/>
+                        </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Rechazar">
+                        <IconButton size="small" onClick={(e) => { e.stopPropagation(); handleRequestResponse(req.sender._id, 'reject'); }} sx={{ bgcolor: 'rgba(255,0,0,0.1)', color: '#f44336', border: '1px solid #f44336', '&:hover': { bgcolor: '#f44336', color: 'white' } }}>
+                            <Close fontSize="small"/>
+                        </IconButton>
+                    </Tooltip>
+                </>
+            ))) : <Typography align="center" sx={{ mt: 4, color: APP_COLORS.textDim }}>No tienes solicitudes pendientes.</Typography>
+        )}
+
+      </Box>
+    </GlassCard>
   );
 };
 

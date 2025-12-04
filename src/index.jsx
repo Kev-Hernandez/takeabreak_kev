@@ -9,7 +9,7 @@ import { ThemeProvider } from './context/ThemeContext';
 import { AuthProvider } from './context/AuthContext.jsx';
 
 import App from './App.jsx';
-import './styles/global.css';
+import './styles/index.css';
 
 const root = createRoot(document.getElementById('root'));
 root.render(

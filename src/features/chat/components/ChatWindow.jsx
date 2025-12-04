@@ -1,47 +1,15 @@
+// src/features/chat/components/ChatWindow.jsx
 import React, { useState, useEffect, useRef } from 'react';
-import { Typography, Drawer, Tooltip, Avatar, ListItem, Box, Button, IconButton } from '@mui/material';
-import { Delete as DeleteIcon, PeopleOutline as PeopleOutlineIcon, Send as SendIcon, MusicNote as MusicNoteIcon } from '@mui/icons-material';
-import Historial from './ChatHistory';
-import { useChat } from '../hooks/useChat';
+import { Box, Typography, Avatar, TextField, IconButton, Tooltip, Drawer, Button, ListItem, Chip } from '@mui/material'; // Agregamos Chip
+import { Send, MusicNote, MoreVert, Delete, PeopleOutline, AutoAwesome } from '@mui/icons-material'; // Agregamos AutoAwesome
+
+import GlassCard from '../../../components/common/GlassCard';
+import { APP_COLORS, THEME_COLORS } from '../../../utils/constants';
+
 import { useChatContext } from '../../../context/ChatContext';
+import { useChat } from '../hooks/useChat';
 import apiClient from '../../../api/apiClient';
-
-// 1. Importamos tus componentes estilizados
-import {
-  ChatContainer, Header, HistoryButton, MessagesArea, MessageList, MessageBubble,
-  Timestamp, MessageInputContainer, StyledTextField, SendButton
-} from './ChatWindow.styles';
-
-// --- 🎨 MAPA DE COLORES ---
-const THEME_COLORS = {
-  'alegría': 'linear-gradient(135deg, #f6d365 0%, #fda085 100%)',
-  'felicidad': 'linear-gradient(135deg, #fce38a 0%, #f38181 100%)',
-  'amor': 'linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #feada6 100%)',
-  'gratitud': 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)',
-  'esperanza': 'linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%)',
-  'calma': 'linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%)',
-  
-  'enojo': 'linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%)',
-  'frustración': 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
-  'estres': 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
-  'ansiedad': 'linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%)',
-
-  'tristeza': 'linear-gradient(135deg, #accbee 0%, #e7f0fd 100%)',
-  'aburrimiento': 'linear-gradient(135deg, #d7d2cc 0%, #304352 100%)',
-  'culpa': 'linear-gradient(135deg, #232526 0%, #414345 100%)',
-  'verguenza': 'linear-gradient(135deg, #e65c00 0%, #F9D423 100%)',
-  'envidia': 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)',
-
-  'depresion_profunda': 'linear-gradient(135deg, #0f2027 0%, #203a43 100%, #2c5364 100%)',
-  'desesperacion_inevitable': 'linear-gradient(135deg, #2C3E50 0%, #000000 100%)',
-  'suicida': 'linear-gradient(135deg, #000000 0%, #434343 100%)',
-  'autolesion': 'linear-gradient(135deg, #191919 0%, #2c3e50 100%)',
-  'psicopata': 'linear-gradient(135deg, #141E30 0%, #243B55 100%)',
-
-  'neutral': '#ffffff', 
-  'neutral_generico': '#ffffff',
-  'default': '#ffffff'
-};
+import Historial from './ChatHistory';
 
 const ChatWindow = () => {
   const { selectedUser } = useChatContext();
@@ -50,8 +18,10 @@ const ChatWindow = () => {
   const [newMessage, setNewMessage] = useState('');
   const [drawerOpen, setDrawerOpen] = useState(false);
   
-  // Estado para el tema actual
+  // Estado para el COLOR del tema
   const [themeColor, setThemeColor] = useState(THEME_COLORS['default']);
+  // ✅ NUEVO: Estado para el NOMBRE de la emoción
+  const [currentEmotion, setCurrentEmotion] = useState('Neutral');
 
   const messagesEndRef = useRef(null);
 
@@ -62,55 +32,42 @@ const ChatWindow = () => {
       setUserName(storedUser.nombre);
     }
   }, []);
-  
+
   const { messages, sendMessage, clearHistory } = useChat(userId, selectedUser);
 
-  // --- 🌈 RESETEO DE COLOR AL CAMBIAR DE USUARIO ---
-  // Este useEffect es CLAVE. Se dispara SOLO cuando cambias de chat (selectedUser).
+  // --- LÓGICA DE TEMAS Y EMOCIONES ---
   useEffect(() => {
-      // Siempre que cambies de amigo, empieza en blanco.
-      // Si el chat tiene mensajes, el siguiente useEffect lo pintará rápido.
-      setThemeColor(THEME_COLORS['default']);
-  }, [selectedUser]); // <--- Dependencia crítica
-
-  // --- 🌈 LÓGICA DE COLOR (Mensajes) ---
-  useEffect(() => {
-    // Si no hay mensajes, nos aseguramos de que sea blanco
+    // Si no hay mensajes o cambiamos de usuario
     if (!messages || messages.length === 0) {
-        setThemeColor(THEME_COLORS['default']);
-        return;
+      setThemeColor(THEME_COLORS['default']);
+      setCurrentEmotion('Neutral'); // Reseteamos nombre
+      return;
     }
 
-    if (messages.length > 0) {
-      const ultimoMensaje = messages[messages.length - 1];
+    const ultimoMensaje = messages[messages.length - 1];
+    
+    if (ultimoMensaje?.emocion) {
+      const emocionRaw = ultimoMensaje.emocion.trim(); // ej: "alegría"
       
-      // Si el mensaje es local (sin emoción), no tocamos el color actual
-      if (!ultimoMensaje.emocion) return;
-
-      let emocion = ultimoMensaje.emocion;
-      if(emocion) emocion = emocion.trim();
-
-      const nuevoTema = THEME_COLORS[emocion] || THEME_COLORS['default'];
+      // 1. Buscamos el color
+      const nuevoTema = THEME_COLORS[emocionRaw] || THEME_COLORS['default'];
       setThemeColor(nuevoTema);
+
+      // 2. ✅ Guardamos el nombre bonito (Primera letra mayúscula)
+      const nombreFormateado = emocionRaw.charAt(0).toUpperCase() + emocionRaw.slice(1);
+      setCurrentEmotion(nombreFormateado);
     }
-  }, [messages]); // Se dispara cuando llegan mensajes
+  }, [messages, selectedUser]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  // ... (Handlers de envío, historial y música siguen IGUAL) ...
   const handleSendMessage = () => {
     if (!newMessage.trim()) return;
     sendMessage(newMessage, userName);
     setNewMessage('');
-  };
-
-  const handleClearHistory = async () => {
-    const confirmed = window.confirm('¿Seguro que quieres borrar el historial del chat?');
-    if (confirmed) {
-      await clearHistory();
-      setThemeColor(THEME_COLORS['default']);
-    }
   };
 
   const handleKeyPress = (e) => {
@@ -120,144 +77,163 @@ const ChatWindow = () => {
     }
   };
 
-  const pedirRecomendacion = async () => {
-    if (!selectedUser?._id) return;
-
-    try {
-        const recipientId = selectedUser._id || selectedUser.id;
-        const response = await apiClient.post('/api/v1/ia/recomendacion-chat', {
-            recipientId: recipientId
-        });
-        const { emocion_dominante, recomendaciones } = response.data;
-        alert(`🤖 IA: Siento un ambiente de "${emocion_dominante}".\n\n🎵 Te recomiendo escuchar:\n${recomendaciones.join('\n')}`);
-    } catch (error) {
-        console.error("Error pidiendo música:", error);
-        alert("La IA musical no está disponible ahora.");
+  const handleClearHistory = async () => {
+    if (window.confirm('¿Borrar historial?')) {
+      await clearHistory();
+      setThemeColor(THEME_COLORS['default']);
+      setCurrentEmotion('Neutral');
+      setDrawerOpen(false);
     }
   };
 
-  const formatTimestamp = (timestamp) => {
-    if (!timestamp) return 'Ahora';
+  const pedirRecomendacion = async () => {
+    if (!selectedUser?._id) return;
     try {
-      const date = new Date(timestamp);
-      if (isNaN(date.getTime())) return 'Ahora';
-      return date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
-    } catch (error) { return 'Ahora'; }
+      const recipientId = selectedUser._id || selectedUser.id;
+      const response = await apiClient.post('/api/v1/ia/recomendacion-chat', { recipientId });
+      const { emocion_dominante, recomendaciones } = response.data;
+      alert(`🤖 IA: Siento "${emocion_dominante}".\n🎵 Escucha:\n${recomendaciones.join('\n')}`);
+    } catch (error) {
+      console.error("Error IA:", error);
+      alert("IA musical no disponible.");
+    }
   };
-  
-  return (
-    <ChatContainer 
-        style={{ 
-            background: themeColor, 
-            transition: 'background 0.5s ease', // Transición un poco más rápida para que el reseteo se sienta bien
-            backgroundSize: 'cover', 
-            backgroundAttachment: 'fixed', 
-            height: '100%',
-            width: '100%',
-            display: 'flex',
-            flexDirection: 'column',
-            overflow: 'hidden',
-            boxSizing: 'border-box'
-        }}
-    >
-      <Header>
-        <Typography variant="h6" sx={{ fontWeight: 600 }}>
-          Chat con {selectedUser?.nombre} {selectedUser?.apellido}
+
+  const formatTimestamp = (ts) => {
+    try { return new Date(ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); } 
+    catch (e) { return ''; }
+  };
+
+  if (!selectedUser) {
+    return (
+      <GlassCard sx={{ justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+        <PeopleOutline sx={{ fontSize: 60, color: 'rgba(255,255,255,0.5)', mb: 2 }} />
+        <Typography variant="h6" sx={{ color: 'rgba(255,255,255,0.7)' }}>
+          Selecciona un amigo para chatear
         </Typography>
-        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <Tooltip title="Vibe Check Musical">
-                <IconButton onClick={pedirRecomendacion} sx={{ color: 'primary.main', mr: 1, bgcolor: 'rgba(255,255,255,0.4)' }}>
-                    <MusicNoteIcon />
-                </IconButton>
-            </Tooltip>
-            <HistoryButton onClick={() => setDrawerOpen(true)}>
-              Historial
-            </HistoryButton>
-        </Box>
-      </Header>
+      </GlassCard>
+    );
+  }
 
-      <Drawer anchor="right" open={drawerOpen} onClose={() => setDrawerOpen(false)} PaperProps={{ sx: { width: { xs: '100%', sm: '400px' }, p: 2 } }}>
-        <Historial messages={messages} />
-        <Button variant="contained" color="error" onClick={handleClearHistory} sx={{ mt: 2, width: '100%' }} startIcon={<DeleteIcon />}>
-          Limpiar historial
-        </Button>
-      </Drawer>
-
-      {!selectedUser?._id ? (
-        <MessagesArea sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <Box sx={{ textAlign: 'center', p: 3 }}>
-            <PeopleOutlineIcon sx={{ fontSize: 60, color: 'white', mb: 2 }} />
-            <Typography variant="h6" color="text.secondary">
-              Selecciona un usuario para comenzar a chatear
-            </Typography>
-          </Box>
-        </MessagesArea>
-      ) : (
-        <>
-          <MessagesArea style={{ flexGrow: 1, overflowY: 'auto' }}>
-            <MessageList>
-              {messages.map((message, index) => (
-                <ListItem key={index} sx={{ display: 'flex', justifyContent: message.sender === 'user' ? 'flex-end' : 'flex-start', px: 0, py: 0.5 }}>
-                  <Box sx={{ display: 'flex', flexDirection: message.sender === 'user' ? 'row-reverse' : 'row', alignItems: 'flex-end', gap: 1.5, maxWidth: '80%' }}>
-                    <Tooltip title={message.remitenteNombre || 'Anónimo'} placement="top">
-                      <Avatar sx={{ bgcolor: message.sender === 'user' ? '#00F5D4' : '#1B263B' }}>
-                        {(message.remitenteNombre)?.[0]?.toUpperCase() || '?'}
-                      </Avatar>
-                    </Tooltip>
-                    
-                    <MessageBubble 
-                        owner={message.sender}
-                        style={{ 
-                            backdropFilter: 'blur(5px)', 
-                            backgroundColor: message.sender === 'user' ? 'rgba(0, 245, 212, 0.9)' : 'rgba(255, 255, 255, 0.85)',
-                            boxShadow: '0 2px 5px rgba(0,0,0,0.1)'
-                        }}
-                    >
-                      <Typography variant="body1" sx={{ color: '#000' }}>{message.text}</Typography>
-                      <Timestamp sx={{ color: '#555' }}>
-                        {formatTimestamp(message.timestamp)}
-                      </Timestamp>
-                    </MessageBubble>
-                  </Box>
-                </ListItem>
-              ))}
-              <div ref={messagesEndRef} />
-            </MessageList>
-          </MessagesArea>
+  return (
+    <GlassCard sx={{ 
+      position: 'relative', height: '100%',
+      '&::before': {
+        content: '""', position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
+        background: themeColor, opacity: 0.6, zIndex: -1, transition: 'background 1s ease'
+      }
+    }}>
+      
+      {/* HEADER */}
+      <Box sx={{ 
+        p: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        borderBottom: `1px solid ${APP_COLORS.glassBorder}`, flexShrink: 0
+      }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <Tooltip title={selectedUser.nombre}>
+            <Avatar sx={{ border: '2px solid white', bgcolor: APP_COLORS.secondary }}>
+              {selectedUser.nombre[0]}
+            </Avatar>
+          </Tooltip>
           
-          <div style={{
-              width: '100%',
-              padding: '15px 20px',
-              background: 'rgba(255, 255, 255, 0.25)', 
-              backdropFilter: 'blur(10px)',            
-              borderTop: '1px solid rgba(255,255,255,0.3)',
-              boxSizing: 'border-box'
-          }}>
-            <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-              <StyledTextField 
-                fullWidth 
-                multiline 
-                maxRows={4} 
-                value={newMessage} 
-                onChange={(e) => setNewMessage(e.target.value)} 
-                onKeyPress={handleKeyPress} 
-                placeholder="Escribe un mensaje..." 
-                variant="outlined" 
-                size="small" 
-                sx={{ 
-                    bgcolor: 'rgba(255,255,255,0.9)', 
-                    borderRadius: 1,
-                    '& .MuiOutlinedInput-root': { borderRadius: '20px' } 
-                }}
-              />
-              <SendButton onClick={handleSendMessage} disabled={!newMessage.trim()}>
-                <SendIcon />
-              </SendButton>
+          <Box>
+            <Typography variant="subtitle1" sx={{ fontWeight: 700, lineHeight: 1.2 }}>
+              {selectedUser.nombre} {selectedUser.apellido}
+            </Typography>
+            
+            {/* ✅ INDICADOR DE EMOCIÓN */}
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mt: 0.5 }}>
+                <AutoAwesome sx={{ fontSize: 12, color: 'rgba(255,255,255,0.8)' }} />
+                <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.9)', fontWeight: 600 }}>
+                    Vibe: {currentEmotion}
+                </Typography>
             </Box>
-          </div>
-        </>
-      )}
-    </ChatContainer>
+          </Box>
+        </Box>
+
+        <Box>
+          <Tooltip title="Pedir música a la IA">
+            <IconButton onClick={pedirRecomendacion} sx={{ color: 'white', mr: 1 }}>
+              <MusicNote />
+            </IconButton>
+          </Tooltip>
+          <IconButton onClick={() => setDrawerOpen(true)} sx={{ color: 'white' }}>
+            <MoreVert />
+          </IconButton>
+        </Box>
+      </Box>
+
+      {/* ÁREA DE MENSAJES */}
+      <Box sx={{ 
+        flex: 1, overflowY: 'auto', p: 3, display: 'flex', flexDirection: 'column', gap: 1.5, minHeight: 0,
+        '&::-webkit-scrollbar': { width: '4px' },
+        '&::-webkit-scrollbar-thumb': { bgcolor: 'rgba(255,255,255,0.3)', borderRadius: '4px' }
+      }}>
+        {messages.map((msg, i) => {
+          const isMe = msg.sender === 'user';
+          return (
+            <Box key={i} sx={{ alignSelf: isMe ? 'flex-end' : 'flex-start', maxWidth: '75%' }}>
+              <Box sx={{
+                p: '12px 18px', borderRadius: '20px',
+                bgcolor: isMe ? 'rgba(255,255,255,0.9)' : 'rgba(0,0,0,0.4)',
+                color: isMe ? '#333' : 'white',
+                borderBottomRightRadius: isMe ? 0 : '20px',
+                borderBottomLeftRadius: isMe ? '20px' : 0,
+                backdropFilter: 'blur(4px)', boxShadow: '0 2px 5px rgba(0,0,0,0.1)'
+              }}>
+                <Typography variant="body1" sx={{ wordWrap: 'break-word' }}>{msg.text}</Typography>
+              </Box>
+              <Typography variant="caption" sx={{ 
+                display: 'block', textAlign: isMe ? 'right' : 'left', mt: 0.5, px: 1,
+                opacity: 0.7, color: 'white', fontSize: '0.7rem'
+              }}>
+                {formatTimestamp(msg.timestamp)}
+              </Typography>
+            </Box>
+          )
+        })}
+        <div ref={messagesEndRef} />
+      </Box>
+
+      {/* INPUT AREA (BLANCO SÓLIDO) */}
+      <Box sx={{ p: 2, pt: 1, flexShrink: 0 }}>
+        <Box sx={{ 
+          display: 'flex', alignItems: 'center', bgcolor: '#ffffff', 
+          boxShadow: '0 5px 20px rgba(0,0,0,0.2)', borderRadius: '30px', 
+          p: '8px 15px', border: '1px solid rgba(0,0,0,0.05)'
+        }}>
+          <TextField 
+            fullWidth variant="standard" placeholder="Escribe un mensaje..." 
+            multiline maxRows={3} value={newMessage} 
+            onChange={e => setNewMessage(e.target.value)}
+            onKeyPress={handleKeyPress}
+            InputProps={{ disableUnderline: true, sx: { color: '#000000', px: 1, fontWeight: 500 } }}
+            sx={{ '& .MuiInputBase-input::placeholder': { color: '#666', opacity: 1 } }}
+          />
+          <IconButton 
+            onClick={handleSendMessage} disabled={!newMessage.trim()}
+            sx={{ 
+              bgcolor: APP_COLORS.primary, color: 'white', width: 40, height: 40, ml: 1,
+              '&:hover': { bgcolor: '#d6336c', transform: 'scale(1.1)' },
+              '&.Mui-disabled': { bgcolor: '#f0f0f0', color: '#ccc' }
+            }}
+          >
+            <Send fontSize="small" />
+          </IconButton>
+        </Box>
+      </Box>
+
+      {/* DRAWER */}
+      <Drawer anchor="right" open={drawerOpen} onClose={() => setDrawerOpen(false)}>
+        <Box sx={{ width: 300, p: 2, height: '100%', bgcolor: '#2b2d42', color: 'white' }}>
+          <Typography variant="h6" gutterBottom>Historial</Typography>
+          <Historial messages={messages} />
+          <Button fullWidth variant="outlined" color="error" startIcon={<Delete />} onClick={handleClearHistory} sx={{ mt: 2 }}>
+            Borrar Historial
+          </Button>
+        </Box>
+      </Drawer>
+    </GlassCard>
   );
 };
 

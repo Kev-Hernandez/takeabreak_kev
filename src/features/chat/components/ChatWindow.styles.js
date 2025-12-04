@@ -1,117 +1,122 @@
 import { styled } from '@mui/material/styles';
-import { Box, Paper, Typography, IconButton, TextField, Button, List } from '@mui/material';
+import { Box, Button, Typography, IconButton, TextField, List, Paper } from '@mui/material';
+// Importamos nuestro componente de cristal reutilizable
+import GlassSurface from '../../../components/common/GlassSurface';
 
-// --- Contenedores Principales ---
-
-export const ChatContainer = styled(Box)(({ theme }) => ({
+// 1. El contenedor principal del chat (ya es de cristal)
+export const ChatContainer = styled(GlassSurface)({
   display: 'flex',
   flexDirection: 'column',
-  height: '100vh',
-  backgroundColor: theme.palette.background.default,
-  borderRadius: '28px',
-  flex: 2,
-}));
+  height: '100%', // Ocupa toda la altura disponible
+  width: '100%',
+  position: 'relative',
+  overflow: 'hidden',
+  borderRadius: '25px',
+});
 
-export const Header = styled(Paper)(({ theme }) => ({
+// 2. El Header (Barra superior con el nombre)
+export const Header = styled(GlassSurface)(({ theme }) => ({
   padding: theme.spacing(2),
   display: 'flex',
   justifyContent: 'space-between',
   alignItems: 'center',
-  borderRadius: 0,
-  backgroundColor: theme.palette.background.paper,
-  color: theme.palette.text.primary,
-  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)',
-  borderBottom: `1px solid ${theme.palette.divider}`,
+  // Quitamos bordes superiores y redondeamos solo abajo para que encaje
+  borderRadius: '0 0 20px 20px', 
+  borderTop: 'none', 
+  borderLeft: 'none', 
+  borderRight: 'none',
+  margin: '0 1px', // Pequeño ajuste lateral
+  zIndex: 5,
+  
+  // ✅ ARREGLO CLAVE 1: Evita que el header se aplaste
+  flexShrink: 0, 
 }));
 
-export const HistoryButton = styled(Button)(({ theme }) => ({
-  backgroundColor: 'rgba(255, 255, 255, 0.1)',
-  color: theme.palette.text.primary,
-  '&:hover': {
-    backgroundColor: `rgba(${theme.palette.primary.mainChannel} / 0.2)`,
-    color: '#00F5D4',
-  },
-}));
-
-export const MessagesArea = styled(Box)({
-  flex: 1,
-  overflowY: 'auto',
-  padding: '16px',
+export const HistoryButton = styled(Button)({
+  backgroundColor: 'rgba(255, 255, 255, 0.2)',
+  color: '#ffffff',
+  borderRadius: '20px',
+  textTransform: 'none',
+  '&:hover': { backgroundColor: 'rgba(255, 255, 255, 0.4)' },
 });
 
-// --- Elementos del Chat ---
+// 3. EL ÁREA DE MENSAJES (Aquí está la magia)
+export const MessagesArea = styled(Box)({
+  // ✅ ARREGLO CLAVE 2: ¡Esto es lo que arregla el salto! 
+  // Le dice: "Crece y ocupa todo el espacio vacío".
+  flexGrow: 1, 
+  
+  overflowY: 'auto', 
+  padding: '20px', 
+  display: 'flex', 
+  flexDirection: 'column',
+  
+  // Esto hace que si hay pocos mensajes, empiecen desde abajo
+  '& > :first-of-type': { marginTop: 'auto' }, 
+
+  // Scrollbar bonito y sutil
+  '&::-webkit-scrollbar': { width: '6px' },
+  '&::-webkit-scrollbar-thumb': { backgroundColor: 'rgba(255,255,255,0.2)', borderRadius: '3px' },
+});
 
 export const MessageList = styled(List)({
-  display: 'flex',
-  flexDirection: 'column',
+  display: 'flex', flexDirection: 'column', width: '100%', padding: 0, margin: 0,
 });
 
-export const MessageBubble = styled(Paper)(({ theme, owner }) => ({
-  padding: '10px 14px',
-  borderRadius: '16px',
+// Burbujas de mensaje (también de cristal)
+export const MessageBubble = styled(GlassSurface)(({ theme, owner }) => ({
+  padding: '12px 18px',
   maxWidth: '75%',
   wordWrap: 'break-word',
+  position: 'relative',
+  border: 'none', // Quitamos el borde por defecto para que sea más suave
+  
   ...(owner === 'user' ? {
-    backgroundColor: theme.palette.primary.main, // <-- CORREGIDO
-    color: theme.palette.primary.contrastText, // <-- CORREGIDO
+    backgroundColor: 'rgba(255, 255, 255, 0.85)', // Más sólido para el usuario
+    color: '#333',
     borderBottomRightRadius: '4px',
+    marginLeft: 'auto',
   } : {
-    backgroundColor: theme.palette.background.paper, // <-- CORREGIDO
-    color: theme.palette.text.primary, // <-- CORREGIDO
+    backgroundColor: 'rgba(0, 0, 0, 0.4)', // Oscuro transparente para el amigo
+    color: '#fff',
     borderBottomLeftRadius: '4px',
+    marginRight: 'auto',
   })
 }));
 
 export const Timestamp = styled(Typography)({
-  fontSize: '10px',
-  opacity: 0.8,
-  display: 'block',
-  textAlign: 'right',
-  marginTop: '4px'
+  fontSize: '0.7rem', opacity: 0.7, textAlign: 'right', marginTop: '4px', color: 'inherit'
 });
 
-// --- Input de Mensaje ---
-
-export const MessageInputContainer = styled(Paper)({
-    padding: '12px 16px',
-    backgroundColor: '#1B263B',
-    borderRadius: '0 0 28px 28px', // Bordes redondeados solo abajo
-    boxShadow: '0 -4px 12px rgba(0, 0, 0, 0.2)',
+// 4. El área del Input (Barra de escribir inferior)
+export const MessageInputContainer = styled(GlassSurface)({
+    padding: '10px 16px',
+    margin: '10px 20px 20px 20px', // Margen para que flote abajo
+    borderRadius: '30px',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '10px',
+    
+    // ✅ ARREGLO CLAVE 3: Evita que la barra de escribir desaparezca o se aplaste
+    flexShrink: 0, 
 });
 
 export const StyledTextField = styled(TextField)({
+  width: '100%',
   '& .MuiOutlinedInput-root': {
-    backgroundColor: '#0D1B2A',
-    borderRadius: '12px',
-    '& fieldset': {
-      border: '1px solid #4f5b6b', // Borde sutil
-    },
-    '&:hover fieldset': {
-      borderColor: '#00F5D4',
-    },
-    '&.Mui-focused fieldset': {
-      borderColor: '#00F5D4',
-    },
-  },
-  '& .MuiInputBase-input': {
-    color: '#E0E1DD',
+    backgroundColor: 'rgba(255, 255, 255, 0.1)', 
+    borderRadius: '20px',
+    color: '#ffffff',
+    '& fieldset': { border: 'none' },
+    '&:hover': { backgroundColor: 'rgba(255, 255, 255, 0.2)' },
+    '&.Mui-focused': { backgroundColor: 'rgba(255, 255, 255, 0.25)' },
   },
   '& .MuiInputBase-input::placeholder': {
-    color: '#A9A9A9',
-    opacity: 1,
+    color: 'rgba(255, 255, 255, 0.7)', opacity: 1,
   },
 });
 
-export const SendButton = styled(IconButton)(({ theme }) => ({
-    backgroundColor: '#00F5D4',
-    color: '#0D1B2A',
-    transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
-    '&:hover': {
-        backgroundColor: '#00F5D4',
-        transform: 'scale(1.1)',
-        boxShadow: `0 0 15px #00F5D4`, // Efecto de brillo
-    },
-    '&:disabled': {
-        backgroundColor: '#1B263B',
-    }
-}));
+export const SendButton = styled(IconButton)({
+    backgroundColor: '#ffffff', color: '#e73c7e', width: '40px', height: '40px',
+    '&:hover': { backgroundColor: '#f8f8f8', transform: 'scale(1.1)' },
+});

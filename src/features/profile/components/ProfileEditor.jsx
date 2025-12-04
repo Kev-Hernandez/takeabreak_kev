@@ -1,80 +1,74 @@
 import React, { useEffect, useState } from 'react';
-import {Box,Paper,Typography,TextField,Button,Grid,Avatar,Snackbar,Alert,MenuItem,IconButton,InputAdornment,Dialog,DialogTitle,DialogContent,DialogActions,Slide} from '@mui/material';
-import SaveIcon from '@mui/icons-material/Save';
-import EmailIcon from '@mui/icons-material/Email';
-import LockIcon from '@mui/icons-material/Lock';
-import EditIcon from '@mui/icons-material/Edit';
-import CloseIcon from '@mui/icons-material/Close';
+import { 
+  Box, Typography, TextField, Button, Grid, Avatar, Snackbar, Alert, 
+  MenuItem, IconButton, InputAdornment, Dialog, DialogTitle, DialogContent, 
+  DialogActions, Slide, CircularProgress 
+} from '@mui/material';
+import { Save, Email, Lock, Edit, Close, Person, Description, Transgender } from '@mui/icons-material';
+
+import GlassCard from '../../../components/common/GlassCard';
+import { APP_COLORS } from '../../../utils/constants';
 import apiClient from '../../../api/apiClient';
 
-// Animación para el diálogo modal
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
 const ProfileEditor = () => {
   const [profile, setProfile] = useState({
-    nombre: '',
-    apellido: '',
-    email: '',
-    password: '',
-    descripcion: '',
-    genero: '',
-    avatar: '',
+    nombre: '', apellido: '', email: '', password: '', descripcion: '', genero: '', avatar: '',
   });
-
+  
   const [availableAvatars, setAvailableAvatars] = useState([]);
+  const [loadingAvatars, setLoadingAvatars] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [serverUrl, setServerUrl] = useState(''); // Guardamos la URL base limpia
+  const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
 
-  const [snackbar, setSnackbar] = useState({
-    open: false,
-    message: '',
-    severity: 'success',
-  });
+  useEffect(() => {
+    const fetchData = async () => {
+      const idUsuario = sessionStorage.getItem('idUsuario');
+      if (!idUsuario) return;
 
-useEffect(() => {
-  const fetchProfileAndAvatars = async () => {
-    const idUsuario = sessionStorage.getItem('idUsuario');
-    try {
-      if (!idUsuario) throw new Error('No se encontró el ID del usuario');
-
-      const [profileRes, avatarsRes] = await Promise.all([
-        apiClient.get(`/api/v1/users/${idUsuario}`),
-        apiClient.get(`/api/v1/users/utils/avatars`),
-      ]);
+      // 1. Determinar la URL base del servidor (sin /api/v1)
+      let baseUrl = apiClient.defaults.baseURL || '';
+      // Si la base termina en /api/v1, lo quitamos para apuntar a la raíz (public)
+      baseUrl = baseUrl.replace(/\/api\/v1\/?$/, ''); 
+      if (baseUrl && !baseUrl.endsWith('/')) baseUrl += '/';
       
-      const profileData = profileRes.data;
-      setProfile(prev => ({
-        ...prev,
-        ...profileData,
-        password: '',
-        genero: profileData.genero || '',
-        avatar: profileData.avatar || '',
-      }));
-      
-      const  baseUrl = apiClient.defaults.baseURL;
-      const avatarUrl = avatarsRes.data.map(avatarFileName => 
-        `${baseUrl}public/avatares/${avatarFileName}`
-      );
+      setServerUrl(baseUrl); // Guardamos ej: http://localhost:4000/
 
-      setAvailableAvatars(avatarUrl);
+      // 2. Cargar Perfil
+      try {
+        const profileRes = await apiClient.get(`/api/v1/users/${idUsuario}`);
+        setProfile(prev => ({ ...prev, ...profileRes.data, password: '' }));
+      } catch (error) {
+        console.error("Error cargando perfil:", error);
+      }
 
-    } catch (error) {
-      console.error('Error al cargar datos:', error);
-      showSnackbar('Error al cargar el perfil o los avatares', 'error');
-    }
-  };
+      // 3. Cargar Avatares (Independiente)
+      setLoadingAvatars(true);
+      try {
+        const avatarsRes = await apiClient.get(`/api/v1/users/utils/avatars`);
+        if (Array.isArray(avatarsRes.data)) {
+          // Guardamos SOLO los nombres de archivo
+          setAvailableAvatars(avatarsRes.data);
+          console.log("Avatares cargados:", avatarsRes.data);
+        }
+      } catch (error) {
+        console.error("Error cargando avatares:", error);
+      } finally {
+        setLoadingAvatars(false);
+      }
+    };
 
-  fetchProfileAndAvatars();
-}, []);
+    fetchData();
+  }, []);
 
-  const handleChange = (e) => {
-    setProfile(prev => ({ ...prev, [e.target.name]: e.target.value }));
-  };
-
-  const handleAvatarSelect = (avatarUrl) => {
-    const avatarFileName = avatarUrl.split('/').pop();
-    setProfile(prev => ({ ...prev, avatar: avatarFileName }));
+  const handleChange = (e) => setProfile(prev => ({ ...prev, [e.target.name]: e.target.value }));
+  
+  const handleAvatarSelect = (fileName) => {
+    setProfile(prev => ({ ...prev, avatar: fileName }));
     setIsModalOpen(false);
   };
 
@@ -82,122 +76,131 @@ useEffect(() => {
     e.preventDefault();
     try {
       const idUsuario = sessionStorage.getItem('idUsuario');
-      
-      const updateData = { ...profile };
-      if (!updateData.password) {
-        delete updateData.password;
-      }
-      
-      await apiClient.put(`/api/v1/users/${idUsuario}`, updateData);
-
-      showSnackbar('Perfil actualizado con éxito', 'success');
+      const data = { ...profile };
+      if (!data.password) delete data.password;
+      await apiClient.put(`/api/v1/users/${idUsuario}`, data);
+      setSnackbar({ open: true, message: 'Perfil actualizado ✨', severity: 'success' });
       setProfile(prev => ({ ...prev, password: '' }));
-
     } catch (error) {
-      console.error('Error al actualizar el perfil:', error);
-      showSnackbar('Error al actualizar el perfil', 'error');
+      setSnackbar({ open: true, message: 'Error al actualizar', severity: 'error' });
     }
   };
 
-  const showSnackbar = (message, severity) => {
-    setSnackbar({ open: true, message, severity });
+  // Construcción segura de la URL de la imagen actual
+  const currentAvatarUrl = profile.avatar 
+    ? `${serverUrl}public/avatares/${profile.avatar}` 
+    : '';
+
+  // --- ESTILOS ---
+  const glassInputStyles = {
+    '& .MuiInputLabel-root': { color: 'rgba(255,255,255,0.7)' },
+    '& .MuiInputLabel-root.Mui-focused': { color: APP_COLORS.secondary },
+    '& .MuiOutlinedInput-root': {
+      color: 'white',
+      backgroundColor: 'rgba(255,255,255,0.05)',
+      borderRadius: '15px',
+      '& fieldset': { borderColor: 'rgba(255,255,255,0.3)' },
+      '&:hover fieldset': { borderColor: 'white' },
+      '&.Mui-focused fieldset': { borderColor: APP_COLORS.secondary },
+    },
+    '& .MuiSvgIcon-root': { color: 'rgba(255,255,255,0.7)' }
   };
-  const fullavatarUrl = profile.avatar ? `${apiClient.defaults.baseURL}public/avatares/${profile.avatar}` : '';
-  console.log('Avatar URL:', fullavatarUrl);
+
   return (
-    <Box sx={{
-      display: 'flex',
-      justifyContent: 'center',
-      p: { xs: 1, sm: 2, md: 3 },
-    }}>
-      <Paper
-        elevation={0}
-        sx={{
-          p: { xs: 2, sm: 3, md: 4 },
-          borderRadius: 4,
-          boxShadow: '0 5px 15px rgba(0,0,0,0.05)',
-          width: '100%',
-          maxWidth: 900,
-        }}
-      >
-        {/* --- Encabezado --- */}
-        <Box sx={{ textAlign: 'center', mb: 4}}>
-          <Typography variant="h4" sx={{ fontWeight: 700 }}>
+    <Box sx={{ display: 'flex', justifyContent: 'center', p: { xs: 0, md: 2 } }}>
+      <GlassCard sx={{ 
+        p: { xs: 3, md: 5 }, maxWidth: 900, width: '100%', alignItems: 'stretch', display: 'block' 
+      }}>
+
+        <Box sx={{ textAlign: 'center', mb: 4 }}>
+          <Typography variant="h4" sx={{ fontWeight: 700, color: 'white', textShadow: '0 2px 4px rgba(0,0,0,0.2)' }}>
             Mi Perfil
           </Typography>
-          <Box sx={{
-            height: 4,
-            width: '60%',
-            background: 'linear-gradient(90deg, #1976d2 0%, #4dabf5 100%)',
-            borderRadius: 2,
-            margin: '8px auto 0'
-          }} />
+          <Box sx={{ height: 4, width: 60, bgcolor: APP_COLORS.secondary, borderRadius: 2, mx: 'auto', mt: 1 }} />
         </Box>
 
-        <Grid container spacing={{ xs: 3, md: 5 }}>
-          {/* --- Columna Izquierda: Avatar --- */}
-          <Grid xs={12} md={4} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+        <Grid container spacing={4}>
+          {/* AVATAR */}
+          <Grid item xs={12} md={4} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             <Box sx={{ position: 'relative' }}>
               <Avatar
-                src={fullavatarUrl}
-                alt={`${profile.nombre} ${profile.apellido}`}
+                src={currentAvatarUrl}
                 sx={{
-                  width: { xs: 120, md: 150 },
-                  height: { xs: 120, md: 150 },
-                  boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                  border: '3px solid white'
+                  width: 160, height: 160,
+                  border: `4px solid ${APP_COLORS.secondary}`,
+                  boxShadow: '0 8px 20px rgba(0,0,0,0.3)',
+                  bgcolor: 'rgba(255,255,255,0.1)'
                 }}
               />
               <IconButton
-                color="primary"
                 onClick={() => setIsModalOpen(true)}
                 sx={{
-                  position: 'absolute',
-                  bottom: 5,
-                  right: 5,
-                  bgcolor: 'background.paper',
-                  boxShadow: 1,
-                  '&:hover': { bgcolor: 'primary.light', color: 'common.white' },
+                  position: 'absolute', bottom: 5, right: 5,
+                  bgcolor: 'white', color: APP_COLORS.primary,
+                  '&:hover': { bgcolor: '#f0f0f0' },
+                  boxShadow: 3
                 }}
               >
-                <EditIcon />
+                <Edit />
               </IconButton>
             </Box>
-            <Box sx={{ textAlign: 'center' }}>
-              <Typography variant="h6" fontWeight={600}>{profile.nombre} {profile.apellido}</Typography>
-              <Typography variant="body2" color="text.secondary">{profile.email}</Typography>
+            
+            <Box sx={{ textAlign: 'center', mt: 2 }}>
+              <Typography variant="h6" sx={{ color: 'white', fontWeight: 600 }}>
+                {profile.nombre} {profile.apellido}
+              </Typography>
+              <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.6)' }}>
+                {profile.email}
+              </Typography>
             </Box>
           </Grid>
-          
-          {/* --- Columna Derecha: Formulario --- */}
-          <Grid xs={12} md={8}>
+
+          {/* FORMULARIO */}
+          <Grid item xs={12} md={8}>
             <form onSubmit={handleSubmit}>
               <Grid container spacing={2}>
-                <Grid xs={12} sm={6}>
-                  <TextField fullWidth label="Nombre" name="nombre" value={profile.nombre} onChange={handleChange} variant="outlined" size="small" />
+                <Grid item xs={12} sm={6}>
+                  <TextField fullWidth label="Nombre" name="nombre" value={profile.nombre} onChange={handleChange} sx={glassInputStyles} 
+                    InputProps={{ startAdornment: <InputAdornment position="start"><Person /></InputAdornment> }}
+                  />
                 </Grid>
-                <Grid xs={12} sm={6}>
-                  <TextField fullWidth label="Apellido" name="apellido" value={profile.apellido} onChange={handleChange} variant="outlined" size="small" />
+                <Grid item xs={12} sm={6}>
+                  <TextField fullWidth label="Apellido" name="apellido" value={profile.apellido} onChange={handleChange} sx={glassInputStyles} />
                 </Grid>
-                <Grid xs={12}>
-                  <TextField fullWidth label="Correo electrónico" name="email" type="email" value={profile.email} onChange={handleChange} variant="outlined" size="small" InputProps={{ endAdornment: <InputAdornment position="end"><EmailIcon fontSize="small" /></InputAdornment> }} />
+                <Grid item xs={12}>
+                  <TextField fullWidth label="Correo" name="email" value={profile.email} onChange={handleChange} sx={glassInputStyles} 
+                    InputProps={{ startAdornment: <InputAdornment position="start"><Email /></InputAdornment> }}
+                  />
                 </Grid>
-                <Grid xs={12}>
-                  <TextField fullWidth label="Nueva Contraseña" name="password" type="password" helperText="Dejar en blanco para mantener la actual" value={profile.password} onChange={handleChange} variant="outlined" size="small" InputProps={{ endAdornment: <InputAdornment position="end"><LockIcon fontSize="small" /></InputAdornment> }} />
+                <Grid item xs={12}>
+                  <TextField fullWidth label="Nueva Contraseña" name="password" type="password" placeholder="Dejar vacío para no cambiar" value={profile.password} onChange={handleChange} sx={glassInputStyles} 
+                    InputProps={{ startAdornment: <InputAdornment position="start"><Lock /></InputAdornment> }}
+                  />
                 </Grid>
-                <Grid xs={12}>
-                  <TextField fullWidth select label="Género" name="genero" value={profile.genero} onChange={handleChange} variant="outlined" size="small">
-                    <MenuItem value="Masculino">Masculino</MenuItem>
-                    <MenuItem value="Femenino">Femenino</MenuItem>
-                    <MenuItem value="Otro">Otro</MenuItem>
-                    <MenuItem value="Prefiero no decir">Prefiero no decir</MenuItem>
+                <Grid item xs={12} sm={6}>
+                  <TextField select fullWidth label="Género" name="genero" value={profile.genero} onChange={handleChange} sx={glassInputStyles}
+                    InputProps={{ startAdornment: <InputAdornment position="start"><Transgender /></InputAdornment> }}
+                  >
+                    {['Masculino', 'Femenino', 'Otro', 'Prefiero no decir'].map(opt => (
+                      <MenuItem key={opt} value={opt}>{opt}</MenuItem>
+                    ))}
                   </TextField>
                 </Grid>
-                <Grid xs={12}>
-                  <TextField fullWidth label="Descripción" name="descripcion" multiline rows={3} value={profile.descripcion} onChange={handleChange} variant="outlined" size="small" helperText="Cuéntanos algo sobre ti" />
+                <Grid item xs={12}>
+                  <TextField fullWidth multiline rows={3} label="Descripción" name="descripcion" value={profile.descripcion} onChange={handleChange} sx={glassInputStyles} 
+                    InputProps={{ startAdornment: <InputAdornment position="start" sx={{mt:1.5}}><Description /></InputAdornment> }}
+                  />
                 </Grid>
-                <Grid xs={12} sx={{ mt: 1 }}>
-                  <Button type="submit" variant="contained" startIcon={<SaveIcon />} fullWidth size="large" sx={{ py: 1.5, fontWeight: 600 }}>
+                
+                <Grid item xs={12} sx={{ mt: 2 }}>
+                  <Button 
+                    type="submit" variant="contained" fullWidth size="large"
+                    startIcon={<Save />}
+                    sx={{ 
+                      bgcolor: APP_COLORS.secondary, color: '#000', fontWeight: 'bold', borderRadius: '50px',
+                      '&:hover': { bgcolor: '#00dbbe', transform: 'scale(1.02)' }
+                    }}
+                  >
                     Guardar Cambios
                   </Button>
                 </Grid>
@@ -205,52 +208,51 @@ useEffect(() => {
             </form>
           </Grid>
         </Grid>
+      </GlassCard>
 
-        <Snackbar open={snackbar.open} autoHideDuration={4000} onClose={() => setSnackbar({ ...snackbar, open: false })} anchorOrigin={{ vertical: 'top', horizontal: 'center' }}>
-          <Alert severity={snackbar.severity} variant="filled" onClose={() => setSnackbar({ ...snackbar, open: false })}>{snackbar.message}</Alert>
-        </Snackbar>
-      </Paper>
-
-      {/* --- DIÁLOGO MODAL PARA SELECCIONAR AVATAR --- */}
-      <Dialog
-        open={isModalOpen}
+      {/* --- MODAL DE AVATAR --- */}
+      <Dialog 
+        open={isModalOpen} onClose={() => setIsModalOpen(false)} 
         TransitionComponent={Transition}
-        keepMounted
-        onClose={() => setIsModalOpen(false)}
-        aria-describedby="avatar-selection-dialog"
+        PaperProps={{ sx: { bgcolor: 'transparent', boxShadow: 'none' } }} 
       >
-        <DialogTitle sx={{ m: 0, p: 2, fontWeight: 600 }}>
-          Elige tu Avatar
-          <IconButton
-            aria-label="close"
-            onClick={() => setIsModalOpen(false)}
-            sx={{ position: 'absolute', right: 8, top: 8, color: (theme) => theme.palette.grey[500] }}
-          >
-            <CloseIcon />
-          </IconButton>
-        </DialogTitle>
-        <DialogContent dividers>
-          <Grid container spacing={2} sx={{ p: 1 }}>
-            {availableAvatars.map((url) => (
-              <Grid key={url} xs={4} sm={3}>
-                <Avatar
-                  src={url}
-                  onClick={() => handleAvatarSelect(url)}
-                  sx={{
-                    width: 80, height: 80, cursor: 'pointer',
-                    border: profile.avatar === url ? '4px solid #1976d2' : '4px solid transparent',
-                    transition: 'all 0.2s ease-in-out',
-                    '&:hover': { transform: 'scale(1.1)', boxShadow: 3 }
-                  }}
-                />
+        <GlassCard sx={{ minWidth: 320, border: `1px solid ${APP_COLORS.glassBorder}` }}>
+          <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', color: 'white' }}>
+            Elige tu Avatar
+            <IconButton onClick={() => setIsModalOpen(false)} sx={{ color: 'rgba(255,255,255,0.5)' }}><Close /></IconButton>
+          </DialogTitle>
+          
+          <DialogContent dividers sx={{ borderColor: 'rgba(255,255,255,0.1)' }}>
+            {loadingAvatars ? (
+              <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}><CircularProgress /></Box>
+            ) : availableAvatars.length === 0 ? (
+              <Typography sx={{ color: 'white', textAlign: 'center' }}>No se encontraron avatares.</Typography>
+            ) : (
+              <Grid container spacing={2}>
+                {availableAvatars.map((fileName) => (
+                  <Grid item xs={4} key={fileName} display="flex" justifyContent="center">
+                    <Avatar 
+                      // Aquí construimos la URL completa usando el serverUrl que limpiamos antes
+                      src={`${serverUrl}public/avatares/${fileName}`} 
+                      onClick={() => handleAvatarSelect(fileName)}
+                      sx={{ 
+                        width: 70, height: 70, cursor: 'pointer',
+                        border: profile.avatar === fileName ? `3px solid ${APP_COLORS.secondary}` : '2px solid transparent',
+                        '&:hover': { transform: 'scale(1.1)' }, transition: 'all 0.2s',
+                        bgcolor: 'rgba(255,255,255,0.1)'
+                      }} 
+                    />
+                  </Grid>
+                ))}
               </Grid>
-            ))}
-          </Grid>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setIsModalOpen(false)}>Cancelar</Button>
-        </DialogActions>
+            )}
+          </DialogContent>
+        </GlassCard>
       </Dialog>
+
+      <Snackbar open={snackbar.open} autoHideDuration={4000} onClose={() => setSnackbar({ ...snackbar, open: false })}>
+        <Alert severity={snackbar.severity} variant="filled" sx={{ borderRadius: '20px' }}>{snackbar.message}</Alert>
+      </Snackbar>
     </Box>
   );
 };

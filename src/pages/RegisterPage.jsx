@@ -1,33 +1,73 @@
 // src/pages/RegisterPage.jsx
 
-import { Box, Typography, Container, Paper } from '@mui/material';
-import './../features/authentication/components/register.css';
-import RegisterForm from '../features/authentication/components/RegisterForm'; // <-- IMPORTANTE
+import React from 'react';
+import { Typography, Paper, Box } from '@mui/material';
+import RegisterForm from '../features/authentication/components/RegisterForm';
+import AuthLayout from '../layouts/AuthLayout';
 
 const RegisterPage = () => {
   return (
-    <Box className="register-box">
-      {/* Figuras decorativas */}
-      <div className="decorative-shape shape-1"></div>
-      <div className="decorative-shape shape-2"></div>
-      <div className="decorative-shape shape-3"></div>
-      <div className="decorative-shape shape-4"></div>
+    <AuthLayout>
+      <Paper 
+        elevation={6} 
+        sx={{
+          // Espaciado interno
+          p: { xs: 4, sm: 5 }, 
+          borderRadius: '30px',
+          
+          // --- ESTILOS CRISTAL (Glassmorphism) ---
+          backgroundColor: 'rgba(255, 255, 255, 0.15)', // Transparente
+          backdropFilter: 'blur(12px)', // Borroso detrás
+          border: '1px solid rgba(255, 255, 255, 0.3)', // Borde brillante
+          boxShadow: '0 15px 35px rgba(0, 0, 0, 0.2)',
+          
+          // Layout flexible
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          width: '100%', 
+          maxWidth: '550px', // Un poco más ancho que el login para que quepan los datos
+          boxSizing: 'border-box'
+        }}
+      >
+        {/* Título Principal */}
+        <Typography 
+          variant="h4" 
+          component="h1" 
+          align="center" 
+          sx={{ 
+            color: '#ffffff', 
+            fontFamily: 'Fredoka, sans-serif', 
+            fontWeight: 'bold', 
+            mb: 1,
+            textShadow: '0 2px 4px rgba(0,0,0,0.2)'
+          }}
+        >
+          Take a Break
+        </Typography>
+        
+        {/* Subtítulo */}
+        <Typography 
+          variant="body1" 
+          align="center" 
+          sx={{ 
+            color: 'rgba(255, 255, 255, 0.9)', 
+            mb: 3,
+            fontWeight: 'normal'
+          }}
+        >
+          Crea tu cuenta para empezar
+        </Typography>
 
-      <Container maxWidth="xs" className="register-container">
-        <Paper elevation={0} className="register-paper">
-          <Typography component="h1" variant="h3" align="center" className="register-title">
-            Take a Break
-          </Typography>
-          <Typography component="h2" variant="h5" align="center" className="register-subtitle">
-            Registro
-          </Typography>
-
-          {/* Aquí se renderiza el componente del formulario de registro */}
+        {/* IMPORTANTE: Envolvemos el formulario con la clase "glass-form".
+           Esto activará los estilos blancos para los inputs que pusimos en index.css 
+        */}
+        <Box className="glass-form" sx={{ width: '100%' }}>
           <RegisterForm />
+        </Box>
 
-        </Paper>
-      </Container>
-    </Box>
+      </Paper>
+    </AuthLayout>
   );
 };
 

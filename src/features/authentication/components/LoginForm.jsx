@@ -4,8 +4,6 @@ import { useNavigate } from 'react-router-dom';
 import { Box, TextField, Button, Typography } from '@mui/material';
 // ✅ 1. Importa el hook del AuthContext
 import { useAuthContext } from '../../../context/AuthContext';
-//import apiClient from '../../../api/apiClient'; // Se mantiene por si AuthContext no lo importa, aunque lo ideal es que AuthContext maneje apiClient
-import './login.css';
 
 const LoginForm = () => {
   const navigate = useNavigate();
