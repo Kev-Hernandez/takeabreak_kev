@@ -49,29 +49,6 @@ const Sidebar = () => {
             {isOpen ? <ChevronLeft /> : <Menu />}
           </IconButton>
 
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, width: '100%', px: 2 }}>
-            {menuItems.map((item, idx) => (
-              <Tooltip key={idx} title={isOpen ? '' : item.text} placement="right">
-                <Box 
-                  onClick={item.action}
-                  sx={{
-                    display: 'flex', alignItems: 'center', p: 1.5, borderRadius: '15px', cursor: 'pointer',
-                    justifyContent: isOpen ? 'flex-start' : 'center',
-                    '&:hover': { bgcolor: 'rgba(255,255,255,0.2)', transform: 'translateX(5px)' },
-                    transition: 'all 0.2s'
-                  }}
-                >
-                  <Box sx={{ color: 'white', display: 'flex' }}>{item.icon}</Box>
-                  {isOpen && <Typography sx={{ ml: 2, fontWeight: 600, color: 'white' }}>{item.text}</Typography>}
-                </Box>
-              </Tooltip>
-            ))}
-          </Box>
-        </Box>
-
-        {/* PARTE INFERIOR: VIBE MONITOR + LOGOUT */}
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, alignItems: 'center', width: '100%' }}>
-          
           {/* MONITOR DE VIBE */}
           <Tooltip title={`Vibe Actual: ${vibeName}`} placement="right">
             <Box sx={{ 
@@ -109,6 +86,30 @@ const Sidebar = () => {
             </Box>
           </Tooltip>
 
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, width: '100%', px: 2 }}>
+            {menuItems.map((item, idx) => (
+              
+              <Tooltip key={idx} title={isOpen ? '' : item.text} placement="right">
+                <Box 
+                  onClick={item.action}
+                  sx={{
+                    display: 'flex', alignItems: 'center', p: 1.5, borderRadius: '15px', cursor: 'pointer',
+                    justifyContent: isOpen ? 'flex-start' : 'center',
+                    '&:hover': { bgcolor: 'rgba(255,255,255,0.2)', transform: 'translateX(5px)' },
+                    transition: 'all 0.2s'
+                  }}
+                >
+                  <Box sx={{ color: 'white', display: 'flex' }}>{item.icon}</Box>
+                  {isOpen && <Typography sx={{ ml: 2, fontWeight: 600, color: 'white' }}>{item.text}</Typography>}
+                </Box>
+              </Tooltip>
+            ))}
+          </Box>
+        </Box>
+
+        {/* PARTE INFERIOR: VIBE MONITOR + LOGOUT */}
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, alignItems: 'center', width: '100%' }}>
+          
           <IconButton onClick={handleLogout} sx={{ color: '#ff6b6b', bgcolor: 'rgba(255,0,0,0.1)', '&:hover': { bgcolor: 'rgba(255,0,0,0.2)' } }}>
             <Logout />
           </IconButton>

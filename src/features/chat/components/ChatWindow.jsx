@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Box, Typography, Avatar, TextField, IconButton, Tooltip, Drawer, Button, ListItem } from '@mui/material';
-import { Send, MusicNote, MoreVert, Delete, PeopleOutline, AutoAwesome } from '@mui/icons-material';
+import { Send, MusicNote, MoreVert, Delete, PeopleOutline, AutoAwesome, ArrowBack } from '@mui/icons-material';
 
 import GlassCard from '../../../components/common/GlassCard';
 import { APP_COLORS, THEME_COLORS } from '../../../utils/constants';
@@ -12,7 +12,7 @@ import Historial from './ChatHistory';
 import { useThemeContext } from '../../../context/ThemeContext';
 
 const ChatWindow = () => {
-  const { selectedUser } = useChatContext();
+  const { selectedUser, handleSelectUser } = useChatContext();
   const [userId, setUserId] = useState(null);
   const [userName, setUserName] = useState('');
   const [newMessage, setNewMessage] = useState('');
@@ -25,6 +25,8 @@ const ChatWindow = () => {
 
   const { setThemeMode } = useThemeContext(); 
   const messagesEndRef = useRef(null);
+
+  const handleBack = () => { handleSelectUser(null); };
 
   useEffect(() => {
     const storedUser = JSON.parse(sessionStorage.getItem('user'));
@@ -157,6 +159,7 @@ const ChatWindow = () => {
       {/* HEADER */}
       <Box sx={{ p: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: `1px solid ${APP_COLORS.glassBorder}`, flexShrink: 0 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <IconButton onClick={handleBack} sx={{ color: 'white' }}><ArrowBack /></IconButton>    
           <Tooltip title={selectedUser.nombre}>
             <Avatar sx={{ border: '2px solid white', bgcolor: APP_COLORS.secondary }}>{selectedUser.nombre[0]}</Avatar>
           </Tooltip>

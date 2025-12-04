@@ -1,5 +1,4 @@
-// fileName: src/context/ChatContext.jsx (VERSIÓN CORREGIDA PARA AMIGOS + VIBES)
-
+// src/context/ChatContext.jsx
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import apiClient from '../api/apiClient';
 
@@ -14,13 +13,12 @@ export const useChatContext = () => {
 };
 
 export const ChatProvider = ({ children }) => {
-  const [users, setUsers] = useState([]); // Lista de AMIGOS
+  const [users, setUsers] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
   const [currentUserId, setCurrentUserId] = useState(null);
   
-  // ✅ NUEVO: MAPA DE VIBES DE AMIGOS
-  // Almacena { 'id_usuario': 'emocion_actual' }
+  // Mapa de Vibes de Amigos
   const [vibeMap, setVibeMap] = useState({});
 
   useEffect(() => {
@@ -31,7 +29,6 @@ export const ChatProvider = ({ children }) => {
 
     const fetchMyFriends = async () => {
       try {
-        // Asegúrate de que este endpoint exista en tu backend
         const response = await apiClient.get('/api/v1/friends/my-friends');
         const data = response.data;
         setUsers(data);
@@ -44,7 +41,15 @@ export const ChatProvider = ({ children }) => {
     fetchMyFriends();
   }, []);
 
+  // ✅ CORRECCIÓN AQUÍ:
   const handleSelectUser = (user) => {
+    // Si mandamos null, es para deseleccionar (botón atrás en móvil)
+    if (!user) {
+      setSelectedUser(null);
+      return;
+    }
+
+    // Si es un usuario válido, lo seleccionamos
     if(user._id !== currentUserId) {
       setSelectedUser(user);
     }
@@ -72,11 +77,9 @@ export const ChatProvider = ({ children }) => {
     });
   };
 
-  // ✅ NUEVA FUNCIÓN: ACTUALIZAR EL VIBE DE UN AMIGO
   const updateUserVibe = (userId, emotion) => {
     if (!userId || !emotion) return;
     setVibeMap(prev => {
-        // Evitamos renderizados innecesarios si la emoción es la misma
         if (prev[userId] === emotion) return prev;
         return { ...prev, [userId]: emotion.trim() };
     });
@@ -89,8 +92,8 @@ export const ChatProvider = ({ children }) => {
     handleSelectUser,
     handleSearchChange,
     addFriendToContext,
-    vibeMap,          // Exportamos el mapa de vibes
-    updateUserVibe,   // Exportamos la función para actualizarlo
+    vibeMap,
+    updateUserVibe,
   };
 
   return <ChatContext.Provider value={value}>{children}</ChatContext.Provider>;
